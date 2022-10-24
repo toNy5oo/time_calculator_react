@@ -51,9 +51,6 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
 
     function onChangeEnd(time) {
         if (time !== null) {
-            message.info(
-                'Tisch ' + table.tableNumber + ' ist jetzt gespeichert'
-            )
             endTime(time, table.tableNumber)
         } else endTime(0, table.tableNumber)
     }
@@ -184,7 +181,7 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                 description={descCardDiscount}
             />
             <Modal
-                title="Geteilte Rechnung"
+                title={`Geteilte Rechnung | Tisch ${table.tableNumber} - ${table.toPay}`}
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}

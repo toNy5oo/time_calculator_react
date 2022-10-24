@@ -6,7 +6,7 @@ import {
     PlusCircleFilled,
     DownloadOutlined,
 } from '@ant-design/icons'
-import { Dropdown, Menu, Space, Button, Popconfirm } from 'antd'
+import { Dropdown, Menu, Space, Button, Popconfirm, Avatar } from 'antd'
 import { Row, Col } from 'antd'
 
 import Container from 'react-bootstrap/Container'
@@ -19,13 +19,26 @@ function TimerHeader({ tables, openTable, resetAllTables }) {
         openTable(key)
     }
 
+    const singleItem = (num) => {
+        return (
+            <Space align="center">
+                Tisch
+                <Avatar
+                    src={require(`./assets/img/${num}ball.png`)}
+                    size="small"
+                    style={{ margin: '2px' }}
+                />
+            </Space>
+        )
+    }
+
     const menu = (
         <Menu
             items={tables.map(
                 (t, i) =>
                     t.isActive === false && {
                         key: t.tableNumber,
-                        label: 'Tisch ' + t.tableNumber,
+                        label: singleItem(t.tableNumber),
                     }
             )}
             onClick={onSelectedItems}
@@ -44,7 +57,7 @@ function TimerHeader({ tables, openTable, resetAllTables }) {
                 <Container>
                     <Navbar.Brand>
                         <Dropdown overlay={menu}>
-                            <a onClick={(e) => e.preventDefault()}>
+                            <a href="#" onClick={(e) => e.preventDefault()}>
                                 <Button
                                     type="primary"
                                     shape="round"
