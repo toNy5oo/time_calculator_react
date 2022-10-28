@@ -6,12 +6,11 @@ import { message } from 'antd'
 import moment from 'moment'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 
-var standardTables = [7, 8, 9, 10]
 const DEFAULT_TEMPLATE = [
     {
         tableNumber: 1,
         isActive: false,
-        start: 0, // 3600sec * 18 (PM)
+        start: 0,
         end: 0,
         played: 0,
         discount: false,
@@ -64,7 +63,7 @@ const DEFAULT_TEMPLATE = [
     },
     {
         tableNumber: 7,
-        isActive: true,
+        isActive: false,
         start: 0,
         end: 0,
         played: 0,
@@ -73,7 +72,7 @@ const DEFAULT_TEMPLATE = [
     },
     {
         tableNumber: 8,
-        isActive: true,
+        isActive: false,
         start: 0,
         end: 0,
         played: 0,
@@ -82,7 +81,7 @@ const DEFAULT_TEMPLATE = [
     },
     {
         tableNumber: 9,
-        isActive: true,
+        isActive: false,
         start: 0,
         end: 0,
         played: 0,
@@ -91,7 +90,16 @@ const DEFAULT_TEMPLATE = [
     },
     {
         tableNumber: 10,
-        isActive: true,
+        isActive: false,
+        start: 0,
+        end: 0,
+        played: 0,
+        discount: false,
+        toPay: 0,
+    },
+    {
+        tableNumber: 147,
+        isActive: false,
         start: 0,
         end: 0,
         played: 0,
@@ -140,8 +148,7 @@ function Timer() {
             })
             return newState
         })
-        //Setting a storage variable
-        // localStorage.setItem('tables', JSON.stringify(tables))
+        setIsEmpty(false)
     }
 
     //Remove table from view
@@ -157,9 +164,7 @@ function Timer() {
                     return {
                         ...obj,
                         tableNumber: tableNumber,
-                        isActive: standardTables.includes(obj.tableNumber)
-                            ? true
-                            : false,
+                        isActive: false,
                         start: 0,
                         end: 0,
                         played: 0,
@@ -170,12 +175,9 @@ function Timer() {
                 // 👇️ otherwise return object as is
                 return obj
             })
-
             return newState
         })
-        //Setting a storage variable
-        console.log(tables)
-        // localStorage.setItem('tables', JSON.stringify(tables))
+        setIsEmpty(!tables.some((table) => table.isActive === 1))
     }
 
     //Update table on start time and minPlayed
@@ -203,8 +205,6 @@ function Timer() {
 
             return newState
         })
-        //Setting a storage variable
-        // localStorage.setItem('tables', JSON.stringify(tables))
     }
 
     //Update table on end time and minPlayed
@@ -303,6 +303,7 @@ function Timer() {
         tables.forEach((t, i) => {
             closeTable(i + 1, false)
         })
+        setIsEmpty(true)
     }
 
     return (
@@ -311,38 +312,43 @@ function Timer() {
                 tables={tables}
                 openTable={openTable}
                 resetAllTables={resetAllTables}
-            />{' '}
-            <Row
-                justify="space-around"
-                align="middle"
-                ref={parent}
-                className="mx-5 mt-3"
-            >
-                {tables.map(
-                    (table) =>
-                        table.isActive && (
-                            <Col
-                                span={4}
-                                offset={1}
-                                className="d-flex justify-content-around my-3 p-1"
-                            >
-                                <Table
-                                    table={table}
-                                    key={table.tableNumber}
-                                    closeTable={closeTable}
-                                    startTime={startTime}
-                                    endTime={endTime}
-                                    toggleDiscount={toggleDiscount}
-                                />{' '}
-                            </Col>
-                        )
-                )}{' '}
-            </Row>{' '}
-            {isEmpty && (
-                <Row justify="space-around" align="middle">
-                    <Col className="text-center"> No active tables </Col>{' '}
+            />
+            {isEmpty ? (
+                <Row justify="center" align="middle">
+                    <Col className="text-center p-5 fs-5">
+                        {' '}
+                        No active tables{' '}
+                    </Col>{' '}
                 </Row>
-            )}{' '}
+            ) : (
+                <Row
+                    justify="space-around"
+                    align="center"
+                    ref={parent}
+                    className="mx-5 mt-3"
+                >
+                    {tables.map(
+                        (table) =>
+                            table.isActive && (
+                                <Col
+                                    xs={24}
+                                    sm={12}
+                                    xl={6}
+                                    className="d-flex justify-content-around my-3 p-1"
+                                >
+                                    <Table
+                                        table={table}
+                                        key={table.tableNumber}
+                                        closeTable={closeTable}
+                                        startTime={startTime}
+                                        endTime={endTime}
+                                        toggleDiscount={toggleDiscount}
+                                    />{' '}
+                                </Col>
+                            )
+                    )}{' '}
+                </Row>
+            )}
         </main>
     )
 }

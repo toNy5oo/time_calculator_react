@@ -10,7 +10,7 @@ import { Dropdown, Menu, Space, Button, Popconfirm, Avatar } from 'antd'
 import { Row, Col } from 'antd'
 
 import Container from 'react-bootstrap/Container'
-import { Nav, Navbar } from 'react-bootstrap'
+import { Navbar } from 'react-bootstrap'
 
 function TimerHeader({ tables, openTable, resetAllTables }) {
     const [dateState, setDateState] = useState(new Date())
@@ -46,6 +46,7 @@ function TimerHeader({ tables, openTable, resetAllTables }) {
     )
 
     useEffect(() => {
+        console.log(tables)
         setInterval(() => {
             setDateState(new Date())
         }, 60000)

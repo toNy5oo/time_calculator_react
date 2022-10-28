@@ -1,17 +1,9 @@
-import {
-    Divider,
-    InputNumber,
-    message,
-    Popconfirm,
-    Space,
-    Switch,
-    Tag,
-} from 'antd'
-import { Button, Modal } from 'antd'
+import { Divider, InputNumber, Popconfirm, Space, Switch, Tag } from 'antd'
+import { Modal } from 'antd'
 import React, { useState } from 'react'
 import {
-    ShareAltOutlined,
-    CloseOutlined,
+    UsergroupAddOutlined,
+    CloseCircleOutlined,
     PercentageOutlined,
     HourglassOutlined,
 } from '@ant-design/icons'
@@ -32,8 +24,6 @@ function range(start, end) {
 function disabledRangeTime() {
     return {
         disabledHours: () => range(0, 18),
-        // disabledMinutes: () => range(0, 60),
-        // disabledSeconds: () => [55, 56],
     }
 }
 
@@ -68,8 +58,7 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                     placeholder={'Angefangen'}
                     onClear={() => alert('cleared')}
                     value={table.start !== 0 ? moment(table.start) : ''}
-                />
-
+                />{' '}
                 <TimePicker
                     bordered={false}
                     format={format}
@@ -80,8 +69,8 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                     placeholder={'Fertig'}
                     disabled={table.start !== 0 ? false : true}
                     value={table.end !== 0 ? moment(table.end) : ''}
-                />
-            </Space>
+                />{' '}
+            </Space>{' '}
         </>
     )
 
@@ -93,9 +82,9 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                         checkedChildren="Ja"
                         unCheckedChildren="Nein"
                         onChange={() => toggleDiscount(table.tableNumber)}
-                    />
-                </Space>
-            </Space>
+                    />{' '}
+                </Space>{' '}
+            </Space>{' '}
         </>
     )
 
@@ -105,8 +94,8 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                 <Avatar
                     src={require(`./assets/img/${table.tableNumber}ball.png`)}
                 />
-                Tisch {table.tableNumber}
-            </Space>
+                Tisch {table.tableNumber}{' '}
+            </Space>{' '}
         </>
     )
 
@@ -136,7 +125,7 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                             table.toPay && 'text-primary'
                         }`}
                     >
-                        {table.played}
+                        {table.played}{' '}
                     </div>
                 ) : (
                     ''
@@ -149,14 +138,16 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                     cancelText="No"
                     onConfirm={() => closeTable(table.tableNumber, true)}
                 >
-                    <CloseOutlined key="close" style={{ color: 'red' }} />
+                    <CloseCircleOutlined key="close" style={{ color: 'red' }} />{' '}
                 </Popconfirm>,
-                <ShareAltOutlined
+                <UsergroupAddOutlined
                     key="share"
                     onClick={table.toPay && showModal}
+                    style={{ fontSize: '20px', flex: 1, alignItems: 'center' }}
                 />,
                 <div className={`fw-bold ${table.toPay && 'text-primary'}`}>
-                    {table.toPay} €
+                    {' '}
+                    {table.toPay}€{' '}
                 </div>,
             ]}
         >
@@ -167,9 +158,9 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                         style={{ fontSize: '20px', color: '#666' }}
                     />
                 }
-                title={<div className="text-muted">Zeit</div>}
+                title={<div className="text-muted"> Zeit </div>}
                 description={descCardTime}
-            />
+            />{' '}
             <Meta
                 className="my-2"
                 avatar={
@@ -177,9 +168,9 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                         style={{ fontSize: '20px', color: '#666' }}
                     />
                 }
-                title={<div className="text-muted">Rabatt</div>}
+                title={<div className="text-muted"> Rabatt </div>}
                 description={descCardDiscount}
-            />
+            />{' '}
             <Modal
                 title={`Geteilte Rechnung | Tisch ${table.tableNumber} - ${table.toPay}`}
                 open={isModalOpen}
@@ -188,24 +179,24 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
             >
                 <div className="d-flex flex-column justify-content-center align-items-center">
                     <div>
-                        <p>Anzahl Personen</p>
+                        <p> Anzahl Personen </p>{' '}
                         <InputNumber
                             onStep={handleChangeInput}
                             min={2}
                             defaultValue={2}
-                        />
-                    </div>
-                    <Divider>Total per person</Divider>
+                        />{' '}
+                    </div>{' '}
+                    <Divider> Total per person </Divider>{' '}
                     <div>
                         <Tag
                             color="blue"
                             style={{ fontSize: '20px', padding: '10px' }}
                         >
-                            € {(table.toPay / sharedBill).toFixed(2)}
-                        </Tag>
-                    </div>
-                </div>
-            </Modal>
+                            €{(table.toPay / sharedBill).toFixed(2)}{' '}
+                        </Tag>{' '}
+                    </div>{' '}
+                </div>{' '}
+            </Modal>{' '}
         </Card>
     )
 }

@@ -14,32 +14,39 @@ function HeaderBar() {
                         src={Logo}
                         preview={false}
                         alt={'BC Haunstetten Logo'}
-                    />
-                </Navbar.Brand>
+                    />{' '}
+                </Navbar.Brand>{' '}
                 <Row>
                     <Col className="mx-3">
                         <Link to="/">
                             <Button type="primary" shape="round" size="large">
-                                Timer
-                            </Button>
-                        </Link>
-                    </Col>
+                                Timer{' '}
+                            </Button>{' '}
+                        </Link>{' '}
+                    </Col>{' '}
                     <Col className="mx-3">
                         <Link to="/getranke">
                             <Button type="primary" shape="round" size="large">
-                                Getränke
-                            </Button>
-                        </Link>
-                    </Col>
+                                Getränke{' '}
+                            </Button>{' '}
+                        </Link>{' '}
+                    </Col>{' '}
                     <Col className="mx-3">
                         <Link to="/reservierungen">
                             <Button type="primary" shape="round" size="large">
-                                Reservierungen
-                            </Button>
-                        </Link>
-                    </Col>
-                </Row>
-            </Container>
+                                Reservierungen{' '}
+                            </Button>{' '}
+                        </Link>{' '}
+                    </Col>{' '}
+                    {/* <Col className="mx-3">
+                        <Link to="/thekendienst">
+                            <Button type="primary" shape="round" size="large">
+                                Thekendienst{' '}
+                            </Button>{' '}
+                        </Link>{' '}
+                    </Col>{' '} */}
+                </Row>{' '}
+            </Container>{' '}
         </Navbar>
         //         <PageHeader
         //     className="site-page-header bg-dark"
