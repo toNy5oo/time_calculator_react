@@ -1,4 +1,3 @@
-import HeaderBar from './components/HeaderBar'
 import Timer from './components/Timer'
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
@@ -8,6 +7,7 @@ import { Content } from 'antd/lib/layout/layout'
 import './App.css'
 import Thekendienst from './components/Thekendienst'
 import Reservierungen from './components/Reservierungen'
+import BootNavbar from './components/BootNavbar'
 
 function App() {
     return (
@@ -15,7 +15,7 @@ function App() {
             <Layout style={{ minHeight: '100vh' }}>
                 <Suspense fallback={<div> Loading... </div>}>
                     {' '}
-                    <HeaderBar />
+                    <BootNavbar />
                     <Content>
                         <Routes>
                             <Route path="/" element={<Timer />} />{' '}

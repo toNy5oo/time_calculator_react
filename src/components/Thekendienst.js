@@ -1,117 +1,346 @@
-import React, { useEffect } from 'react'
-import { Avatar, Badge, Calendar, Space, Col } from 'antd'
+import React, { useEffect, useState } from 'react'
+import 'moment/locale/en-gb'
+import locale from 'antd/es/date-picker/locale/en_GB'
+import {
+    Alert,
+    Calendar,
+    Input,
+    Modal,
+    Space,
+    Segmented,
+    notification,
+} from 'antd'
 import './assets/css/thekendienst.css'
-import { UserOutlined } from '@ant-design/icons'
+import {
+    StopOutlined,
+    PlusCircleOutlined,
+    PlusOutlined,
+    TeamOutlined,
+    CheckCircleOutlined,
+    SmileOutlined,
+    UserOutlined,
+} from '@ant-design/icons'
 import { Container } from 'react-bootstrap/'
 import moment from 'moment'
-
-const getListData = (value) => {
-    let listData
-    switch (value.date()) {
-        case 8:
-            listData = [
-                {
-                    type: 'warning',
-                    content: 'This is warning event.',
-                },
-                {
-                    type: 'success',
-                    content: 'This is usual event.',
-                },
-            ]
-            break
-        case 10:
-            listData = [
-                {
-                    type: 'warning',
-                    content: 'This is warning event.',
-                },
-                {
-                    type: 'success',
-                    content: 'This is usual event.',
-                },
-                {
-                    type: 'error',
-                    content: 'This is error event.',
-                },
-            ]
-            break
-        case 15:
-            listData = []
-            break
-        default:
-    }
-    return listData || []
-}
-
-const getMonthData = (value) => {
-    if (value.month() === 8) {
-        return 1394
-    }
-}
-
-function onPanelChange(value, mode) {
-    console.log(value, mode)
-}
-function onChange(value, mode) {
-    console.log(moment(value).format('MM/DD/YYYY'))
-}
-function onSelect(value, mode) {
-    console.log(moment(value).format('MM/DD/YYYY'))
-}
+import LocaleProvider from 'antd/lib/locale-provider'
+import { locales } from 'moment'
+import SimpleButton from './SimpleButton'
 
 function Thekendienst() {
-    useEffect(() => {
-        /**
-         * fetch data from db
-         */
-    })
+    const [user, setUser] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(false)
+    const [value, setValue] = useState(() => moment())
+    const [selectedValue, setSelectedValue] = useState(() =>
+        moment().format('DD/MM/YYYY')
+    )
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [calendarData, setCalendarData] = useState([])
+    const [alertType, setAlertType] = useState(['info'])
+    const [userIsMandatory, setUserIsMandatory] = useState('')
 
-    const monthCellRender = (value) => {
-        const num = getMonthData(value)
-        return num ? (
-            <div className="notes-month">
-                <section>{num}</section>
-                <span>Backlog number</span>
-            </div>
-        ) : null
+    const openNotification = (name, date) => {
+        notification.open({
+            message: 'Schicht hinzugefügt',
+            description: (
+                <>
+                    <strong>{name}</strong> wird an dem <strong>{date}</strong>{' '}
+                    an der Bar arbeiten'
+                </>
+            ),
+            icon: (
+                <SmileOutlined
+                    style={{
+                        color: '#108ee9',
+                    }}
+                />
+            ),
+        })
     }
 
+    useEffect(() => {
+        setLoading(true)
+        fetch(`http://localhost:5000/api_calendar/?date=${selectedValue}`)
+            .then((response) => {
+                if (response.ok) {
+                    return response.json()
+                }
+                throw response
+            })
+            .then((data) => {
+                setCalendarData(data)
+                console.log('List: ', calendarData)
+            })
+            .catch((error) => {
+                setError(true)
+                console.log('Error fetching data ,', error)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    }, [])
+
+    const showModal = () => {
+        calendarData.map((el) => {
+            if (el.date === selectedValue) {
+                setUser(el.name)
+            }
+        })
+        setIsModalOpen(true)
+    }
+
+    /*
+     * Post to change or update the user that works a specific shift
+     */
+    const handleOk = () => {
+        if (user !== '') {
+            let month = moment(selectedValue, 'DD/MM/YYYY')
+                .format('MMMM')
+                .toLowerCase()
+            const year = moment(selectedValue, 'DD/MM/YYYY')
+                .format('YYYY')
+                .toLowerCase()
+            let newShift = { date: selectedValue, name: user }
+
+            fetch(
+                `http://localhost:5000/api_calendar/?month=${month.toLowerCase()}&year=${year.toLowerCase()}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newShift),
+                }
+            )
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    throw response
+                })
+                .then((data) => {
+                    setCalendarData(data)
+                    console.log(data)
+                    console.log('List: ', calendarData)
+                })
+                .catch((error) => {
+                    setError(true)
+                    console.log('Error fetching data ,', error)
+                })
+                .finally(() => {
+                    setLoading(false)
+                    setIsModalOpen(false)
+                    openNotification(user, selectedValue)
+                })
+        } else {
+            setUserIsMandatory('warning')
+        }
+    }
+
+    //Calendar method
     const dateCellRender = (value) => {
-        const listData = getListData(value)
-        return (
-            <Space align="center">
-                <Avatar src="https://joeschmoe.io/api/v1/random" />
-                <h6>Name</h6>
-            </Space>
+        const style = {
+            textAlign: 'center',
+            marginBottom: 10,
+            fontSize: 20,
+            color: 'Green',
+        }
+
+        if (moment(value).day() === 1 || moment(value).day() === 2) {
+            return (
+                <div style={style}>
+                    <StopOutlined style={{ color: 'Crimson' }} />
+                </div>
+            )
+        }
+
+        return calendarData.map((item) =>
+            item.date === value.format('DD/MM/YYYY') ? (
+                item.name !== 'N/A' ? (
+                    <div key={item.date} style={style}>
+                        <CheckCircleOutlined />
+                    </div>
+                ) : (
+                    <div style={style}>
+                        <PlusCircleOutlined
+                            style={{
+                                fontSize: 20,
+                                color: 'DarkOrange',
+                            }}
+                        />
+                    </div>
+                )
+            ) : (
+                ''
+            )
         )
     }
 
-    const dateFullCellRender = (date) => {
-        const day = date.day()
-        let style
-        if (day === 1 || day === 2) {
-            style = { border: '1px solid #d9d9d9' }
-        } else {
-            style = { border: '1px solid red' }
-        }
-        return <div style={style}>{day}</div>
+    //Modal method
+    const handleCancel = () => {
+        setIsModalOpen(false)
     }
-    // return <div>{moment(value).format('DD/MM')}</div>
 
+    //Modal change event
+    const inputOnChange = (newValue) => {
+        setUser(newValue.target.value)
+    }
+
+    const onSelect = (newValue) => {
+        setValue(newValue)
+        setSelectedValue(moment(newValue).format('DD/MM/YYYY'))
+    }
+
+    const onPanelChange = (newValue) => {
+        setValue(newValue)
+    }
+
+    function alertMessage() {
+        return calendarData.map((el) => {
+            if (el.date === selectedValue) {
+                el.name !== 'N/A'
+                    ? setAlertType('info')
+                    : setAlertType('warning')
+                return el.name !== 'N/A' ? (
+                    <>
+                        Datum: <strong>{selectedValue}</strong> Thekendienst:{' '}
+                        <strong>{el.name}</strong>
+                    </>
+                ) : (
+                    <>
+                        Datum: <strong>{selectedValue}</strong> Keine mitglieder
+                        am Thekendienst
+                    </>
+                )
+            }
+        })
+    }
+
+    const headerRender = ({ value, type, onChange, onTypeChange }) => {
+        return (
+            <>
+                <div className="m-4 d-flex justify-content-around align-items-center">
+                    <Alert
+                        message={alertMessage()}
+                        type={alertType}
+                        showIcon
+                        style={{
+                            marginBottom: '10px',
+                            marginTop: '20px',
+                            width: '100%',
+                        }}
+                        action={
+                            <Space>
+                                {calendarData.map((el) => {
+                                    if (el.date === selectedValue) {
+                                        return el.name !== 'N/A' ? (
+                                            <SimpleButton
+                                                type="primary"
+                                                text="Change"
+                                                onClick={showModal}
+                                                icon={<TeamOutlined />}
+                                                style={{}}
+                                            />
+                                        ) : (
+                                            <SimpleButton
+                                                type="danger"
+                                                text="Add"
+                                                onClick={showModal}
+                                                icon={<PlusOutlined />}
+                                            />
+                                        )
+                                    }
+                                })}
+                            </Space>
+                        }
+                    />
+                </div>
+                <div
+                    style={{
+                        textAlign: 'center',
+                        marginBottom: 30,
+                        fontSize: 14,
+                        display: 'flex',
+                        justifyContent: 'space-around',
+                        alignItems: 'center',
+                    }}
+                >
+                    <div>
+                        <StopOutlined style={{ color: 'crimson' }} />
+                        <div>Verein zu</div>
+                    </div>
+                    <div>
+                        <PlusCircleOutlined style={{ color: 'DarkOrange' }} />
+                        <div>Unbelegt</div>
+                    </div>
+                    <div>
+                        <CheckCircleOutlined style={{ color: 'Green' }} />
+                        <div>Schön gebucht</div>
+                    </div>
+                </div>
+                <div className="m-4 d-flex justify-content-center align-items-center gap-2">
+                    <Segmented
+                        defaultValue={moment(value, 'DD/MM/YYYY').format(
+                            'MMMM'
+                        )}
+                        options={[
+                            moment(value, 'DD/MM/YYYY').format('MMMM'),
+                            'Next Month',
+                        ]}
+                    />
+                </div>
+            </>
+        )
+    }
     return (
-        <Container>
-            <Calendar
-                dateCellRender={dateCellRender}
-                monthCellRender={monthCellRender}
-                dateFullCellRender={dateFullCellRender}
-                fullscreen={true}
-                validRange={[moment(), moment().add(2, 'years')]}
-                // onChange={onChange}
-                onPanelChange={onPanelChange}
-                onSelect={onSelect}
-            />
-        </Container>
+        <>
+            <Container className="p-3">
+                <LocaleProvider locale={locales.en_GB}>
+                    <Calendar
+                        value={value}
+                        onSelect={onSelect}
+                        onPanelChange={onPanelChange}
+                        headerRender={headerRender}
+                        dateCellRender={dateCellRender}
+                        locale={locale}
+                        defaultValue={moment(new Date(), 'DD/MM/YYYY')}
+                    />
+                </LocaleProvider>
+            </Container>
+            <Modal
+                title="Add to Calendar"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={350}
+                style={{ textAlign: 'center' }}
+                focusTriggerAfterClose={true}
+            >
+                <Space direction="vertical">
+                    <p>Tag:</p>
+                    <p>
+                        <Alert
+                            message={selectedValue}
+                            type="info"
+                            style={{
+                                minWidth: '60%',
+                                margin: '0px auto',
+                                marginBottom: '0px',
+                            }}
+                        />
+                    </p>
+                    <p>Name:</p>
+                    <Input
+                        prefix={<UserOutlined />}
+                        placeholder="Mitglieders Name"
+                        onChange={inputOnChange}
+                        value={user != 'N/A' ? user : ''}
+                        status={userIsMandatory}
+                    />
+                </Space>
+            </Modal>
+        </>
     )
 }
 

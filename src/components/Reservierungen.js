@@ -1,7 +1,9 @@
 import React from 'react'
+import { Empty } from 'antd'
 
 function Reservierungen() {
-    return <div> Reservierungen </div>
+    return <Empty image = { Empty.PRESENTED_IMAGE_SIMPLE }
+    />
 }
 
 export default Reservierungen
