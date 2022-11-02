@@ -60,7 +60,11 @@ function Thekendienst() {
 
     useEffect(() => {
         setLoading(true)
-        fetch(`http://localhost:5000/api_calendar/?date=${selectedValue}`)
+
+        fetch(
+            `https://server-theklendienst.onrender.com/api_calendar?date=${selectedValue}`
+        )
+            // fetch(`http://localhost:5000/api_calendar/?date=${selectedValue}`)
             .then((response) => {
                 if (response.ok) {
                     return response.json()
@@ -103,7 +107,8 @@ function Thekendienst() {
             let newShift = { date: selectedValue, name: user }
 
             fetch(
-                `http://localhost:5000/api_calendar/?month=${month.toLowerCase()}&year=${year.toLowerCase()}`,
+                `https://server-theklendienst.onrender.com/api_calendar?month=${month.toLowerCase()}&year=${year.toLowerCase()}`,
+                // `http://localhost:5000/api_calendar/?month=${month.toLowerCase()}&year=${year.toLowerCase()}`,
                 {
                     method: 'POST',
                     headers: {
@@ -335,7 +340,7 @@ function Thekendienst() {
                         prefix={<UserOutlined />}
                         placeholder="Mitglieders Name"
                         onChange={inputOnChange}
-                        value={user != 'N/A' ? user : ''}
+                        value={user !== 'N/A' ? user : ''}
                         status={userIsMandatory}
                     />
                 </Space>
