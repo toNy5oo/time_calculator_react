@@ -32,6 +32,7 @@ import moment from 'moment'
 import LocaleProvider from 'antd/lib/locale-provider'
 import { locales } from 'moment'
 import SimpleButton from './SimpleButton'
+import ListLoading from './ListLoading'
 
 function Thekendienst() {
     const [user, setUser] = useState('')
@@ -358,6 +359,7 @@ function Thekendienst() {
                             }}
                             className="demo-loadmore-list"
                             itemLayout="horizontal"
+                            loading={<ListLoading />}
                             dataSource={calendarData}
                             renderItem={renderListItem}
                             header={
