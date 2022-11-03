@@ -1,4 +1,4 @@
-import { Avatar, List, Space, Typography } from 'antd'
+import { Avatar, Divider, List, Space, Typography } from 'antd'
 import moment from 'moment'
 import React, { useState } from 'react'
 import SimpleButton from './SimpleButton'
@@ -8,6 +8,7 @@ import {
     CloseCircleOutlined,
     CalendarOutlined,
     UserOutlined,
+    QuestionOutlined,
 } from '@ant-design/icons'
 
 const ListItem = ({ date, name, showModal }) => {
@@ -18,10 +19,17 @@ const ListItem = ({ date, name, showModal }) => {
 
     return (
         <div>
+            <Divider style={{ color: '#006699' }}>
+                <CalendarOutlined className="mx-2" />
+                {moment(date, 'DD/MM/YYYY').format('dddd')},{' '}
+                <strong>
+                    {moment(date, 'DD/MM/YYYY').format('DD/MM/YYYY')}
+                </strong>
+            </Divider>
             <List.Item
                 actions={[
-                    !isClosed ? (
-                        name !== 'N/A' ? (
+                    !isClosed &&
+                        (name !== 'N/A' ? (
                             <SimpleButton
                                 type="primary"
                                 text="Change"
@@ -37,18 +45,7 @@ const ListItem = ({ date, name, showModal }) => {
                                 onClick={showModal}
                                 icon={<PlusOutlined />}
                             />
-                        )
-                    ) : (
-                        <Typography.Text
-                            strong={true}
-                            style={{
-                                color: 'FireBrick',
-                                fontSize: 'min(14px)',
-                            }}
-                        >
-                            {/* Poolcity ist zu */}
-                        </Typography.Text>
-                    ),
+                        )),
                 ]}
             >
                 <Space align="center">
@@ -62,21 +59,45 @@ const ListItem = ({ date, name, showModal }) => {
                                     color: 'black',
                                 }}
                             >
-                                {name}
+                                {name !== 'N/A' ? (
+                                    <UserOutlined />
+                                ) : (
+                                    <QuestionOutlined />
+                                )}
                             </Avatar>
                         </>
                     ) : (
-                        <CloseCircleOutlined
-                            style={{ fontSize: '40px', color: 'fireBrick' }}
-                        />
+                        <Avatar
+                            size={40}
+                            style={{
+                                backgroundColor: '#339900 ',
+                                color: 'black',
+                            }}
+                        >
+                            <CloseCircleOutlined
+                                style={{ fontSize: 'px', color: 'white' }}
+                            />
+                        </Avatar>
                     )}
-
-                    <Space
+                    <Typography.Text
+                        strong={true}
+                        style={{
+                            color: 'DimGray',
+                            fontSize: 'min(18px)',
+                            marginLeft: '10px',
+                        }}
+                    >
+                        {!isClosed
+                            ? name !== 'N/A'
+                                ? name
+                                : 'Unbelegt'
+                            : 'Poolcity ist Zu'}
+                    </Typography.Text>
+                    {/* <Space
                         direction="vertical"
                         align="center"
                         style={{ marginLeft: '10px' }}
                     >
-                        {/* <CalendarOutlined /> */}
                         <Typography.Text
                             strong={true}
                             style={{
@@ -95,7 +116,7 @@ const ListItem = ({ date, name, showModal }) => {
                         >
                             {moment(date, 'DD/MM/YYYY').format('DD/MM/YYYY')}
                         </Typography.Text>
-                    </Space>
+                    </Space> */}
                 </Space>
             </List.Item>
         </div>

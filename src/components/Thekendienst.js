@@ -350,12 +350,12 @@ function Thekendienst() {
     }
     return (
         <>
-            <Container className="p-3">
+            <Container className="">
                 <LocaleProvider locale={locales.en_GB}>
                     {width < 768 ? (
                         <List
                             style={{
-                                backgroundColor: 'whitesmoke',
+                                // backgroundColor: 'whitesmoke',
                                 padding: '10px',
                                 width: '100%',
                             }}
@@ -366,7 +366,9 @@ function Thekendienst() {
                             renderItem={renderListItem}
                             header={
                                 <Typography.Text className="fw-bold text-uppercase">
-                                    {moment(value, 'DD/MM/YYYY').format('MMMM')}
+                                    {moment(value, 'DD/MM/YYYY').format(
+                                        'MMMM'
+                                    ) + '  Thekendienst'}
                                 </Typography.Text>
                             }
                         />
