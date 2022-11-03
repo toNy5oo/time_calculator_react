@@ -9,6 +9,11 @@ import {
     Space,
     Segmented,
     notification,
+    Avatar,
+    List,
+    Skeleton,
+    Typography,
+    Divider,
 } from 'antd'
 import './assets/css/thekendienst.css'
 import {
@@ -19,8 +24,10 @@ import {
     CheckCircleOutlined,
     SmileOutlined,
     UserOutlined,
+    CalendarOutlined,
 } from '@ant-design/icons'
 import { Container } from 'react-bootstrap/'
+import ListItem from './ListItem'
 import moment from 'moment'
 import LocaleProvider from 'antd/lib/locale-provider'
 import { locales } from 'moment'
@@ -38,6 +45,7 @@ function Thekendienst() {
     const [calendarData, setCalendarData] = useState([])
     const [alertType, setAlertType] = useState(['info'])
     const [userIsMandatory, setUserIsMandatory] = useState('')
+    const [width, setWindowWidth] = useState(0)
 
     const openNotification = (name, date) => {
         notification.open({
@@ -56,6 +64,18 @@ function Thekendienst() {
                 />
             ),
         })
+    }
+
+    useEffect(() => {
+        updateDimensions()
+
+        window.addEventListener('resize', updateDimensions)
+        return () => window.removeEventListener('resize', updateDimensions)
+    }, [])
+
+    const updateDimensions = () => {
+        const width = window.innerWidth
+        setWindowWidth(width)
     }
 
     useEffect(() => {
@@ -152,6 +172,7 @@ function Thekendienst() {
             color: 'Green',
         }
 
+        //If Monday or Tuesday
         if (moment(value).day() === 1 || moment(value).day() === 2) {
             return (
                 <div style={style}>
@@ -160,25 +181,39 @@ function Thekendienst() {
             )
         }
 
-        return calendarData.map((item) =>
-            item.date === value.format('DD/MM/YYYY') ? (
-                item.name !== 'N/A' ? (
-                    <div key={item.date} style={style}>
-                        <CheckCircleOutlined />
-                    </div>
-                ) : (
-                    <div style={style}>
-                        <PlusCircleOutlined
-                            style={{
-                                fontSize: 20,
-                                color: 'DarkOrange',
-                            }}
-                        />
-                    </div>
-                )
-            ) : (
-                ''
-            )
+        return calendarData.map(
+            (item) =>
+                item.date === value.format('DD/MM/YYYY') && getName(item, style)
+        )
+    }
+
+    function getName(item, style) {
+        console.log('Item: ' + item)
+        return item.name !== 'N/A' ? (
+            <div key={item.date} style={style}>
+                <Avatar
+                    gap={5}
+                    size={{
+                        md: 42,
+                        lg: 42,
+                        xl: 46,
+                        xxl: 46,
+                    }}
+                    style={{
+                        backgroundColor: ' skyblue ',
+                        color: 'black',
+                        textTransform: 'uppercase',
+                    }}
+                >
+                    {item.name}
+                </Avatar>
+            </div>
+        ) : (
+            <div style={style}>
+                <PlusCircleOutlined
+                    style={{ fontSize: 20, color: 'DarkOrange' }}
+                />
+            </div>
         )
     }
 
@@ -220,6 +255,18 @@ function Thekendienst() {
                 )
             }
         })
+    }
+
+    const renderListItem = (item) => {
+        return (
+            <>
+                <ListItem
+                    date={item.date}
+                    name={item.name}
+                    showModal={showModal}
+                />
+            </>
+        )
     }
 
     const headerRender = ({ value, type, onChange, onTypeChange }) => {
@@ -291,7 +338,7 @@ function Thekendienst() {
                         )}
                         options={[
                             moment(value, 'DD/MM/YYYY').format('MMMM'),
-                            'Next Month',
+                            // 'Next Month',
                         ]}
                     />
                 </div>
@@ -302,15 +349,34 @@ function Thekendienst() {
         <>
             <Container className="p-3">
                 <LocaleProvider locale={locales.en_GB}>
-                    <Calendar
-                        value={value}
-                        onSelect={onSelect}
-                        onPanelChange={onPanelChange}
-                        headerRender={headerRender}
-                        dateCellRender={dateCellRender}
-                        locale={locale}
-                        defaultValue={moment(new Date(), 'DD/MM/YYYY')}
-                    />
+                    {width < 768 ? (
+                        <List
+                            style={{
+                                backgroundColor: 'whitesmoke',
+                                padding: '10px',
+                                width: '100%',
+                            }}
+                            className="demo-loadmore-list"
+                            itemLayout="horizontal"
+                            dataSource={calendarData}
+                            renderItem={renderListItem}
+                            header={
+                                <Typography.Text className="fw-bold text-uppercase">
+                                    {moment(value, 'DD/MM/YYYY').format('MMMM')}
+                                </Typography.Text>
+                            }
+                        />
+                    ) : (
+                        <Calendar
+                            value={value}
+                            onSelect={onSelect}
+                            onPanelChange={onPanelChange}
+                            headerRender={headerRender}
+                            dateCellRender={dateCellRender}
+                            locale={locale}
+                            defaultValue={moment(new Date(), 'DD/MM/YYYY')}
+                        />
+                    )}
                 </LocaleProvider>
             </Container>
             <Modal
