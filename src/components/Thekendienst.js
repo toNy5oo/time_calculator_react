@@ -47,6 +47,7 @@ function Thekendienst() {
     const [alertType, setAlertType] = useState(['info'])
     const [userIsMandatory, setUserIsMandatory] = useState('')
     const [width, setWindowWidth] = useState(0)
+    const [initLoading, setInitLoading] = useState(true)
 
     const openNotification = (name, date) => {
         notification.open({
@@ -101,6 +102,7 @@ function Thekendienst() {
                 console.log('Error fetching data ,', error)
             })
             .finally(() => {
+                setInitLoading(false)
                 setLoading(false)
             })
     }, [])
@@ -359,7 +361,7 @@ function Thekendienst() {
                             }}
                             className="demo-loadmore-list"
                             itemLayout="horizontal"
-                            loading={<ListLoading />}
+                            loading={initLoading}
                             dataSource={calendarData}
                             renderItem={renderListItem}
                             header={
