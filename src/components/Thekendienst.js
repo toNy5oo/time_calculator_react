@@ -93,7 +93,7 @@ function Thekendienst() {
             })
             .then((data) => {
                 setCalendarData(data)
-                console.log('List: ', calendarData)
+                // console.log('List: ', calendarData)
             })
             .catch((error) => {
                 setError(true)
@@ -105,12 +105,8 @@ function Thekendienst() {
             })
     }, [])
 
-    const showModal = () => {
-        calendarData.map((el) => {
-            if (el.date === selectedValue) {
-                setUser(el.name)
-            }
-        })
+    const showModal = (val) => {
+        setSelectedValue(val)
         setIsModalOpen(true)
     }
 
@@ -147,8 +143,8 @@ function Thekendienst() {
                 })
                 .then((data) => {
                     setCalendarData(data)
-                    console.log(data)
-                    console.log('List: ', calendarData)
+                    // console.log(data)
+                    // console.log('List: ', calendarData)
                 })
                 .catch((error) => {
                     setError(true)
@@ -189,7 +185,7 @@ function Thekendienst() {
     }
 
     function getName(item, style) {
-        console.log('Item: ' + item)
+        // console.log('Item: ' + item)
         return item.name !== 'N/A' ? (
             <div key={item.date} style={style}>
                 <Avatar
@@ -291,7 +287,9 @@ function Thekendienst() {
                                             <SimpleButton
                                                 type="primary"
                                                 text="Change"
-                                                onClick={showModal}
+                                                onClick={() =>
+                                                    showModal(el.date)
+                                                }
                                                 icon={<TeamOutlined />}
                                                 style={{}}
                                             />
@@ -299,7 +297,9 @@ function Thekendienst() {
                                             <SimpleButton
                                                 type="danger"
                                                 text="Add"
-                                                onClick={showModal}
+                                                onClick={() =>
+                                                    showModal(el.date)
+                                                }
                                                 icon={<PlusOutlined />}
                                             />
                                         )

@@ -1,7 +1,7 @@
 import { Button } from 'antd'
 import React from 'react'
 
-function SimpleButton({ text, onClick, type, icon, style }) {
+function SimpleButton({ text, onClick, type, icon, style, date }) {
     return (
         <Button
             size="default"
@@ -9,6 +9,7 @@ function SimpleButton({ text, onClick, type, icon, style }) {
             onClick={onClick}
             icon={icon}
             style={style}
+            key={date}
         >
             {' '}
             {text}{' '}

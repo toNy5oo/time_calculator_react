@@ -33,16 +33,18 @@ const ListItem = ({ date, name, showModal }) => {
                             <SimpleButton
                                 type="primary"
                                 text="Change"
-                                onClick={showModal}
+                                onClick={() => showModal(date)}
                                 icon={<TeamOutlined />}
                                 size="small"
+                                id={date}
                             />
                         ) : (
                             <SimpleButton
                                 size="small"
                                 type="danger"
                                 text="Add"
-                                onClick={showModal}
+                                onClick={() => showModal(date)}
+                                id={date}
                                 icon={<PlusOutlined />}
                             />
                         )),
