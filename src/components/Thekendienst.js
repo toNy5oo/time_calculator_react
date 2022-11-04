@@ -36,7 +36,7 @@ import ListLoading from './ListLoading'
 
 function Thekendienst() {
     const [user, setUser] = useState('')
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
     const [value, setValue] = useState(() => moment())
     const [selectedValue, setSelectedValue] = useState(() =>
@@ -70,7 +70,6 @@ function Thekendienst() {
 
     useEffect(() => {
         updateDimensions()
-
         window.addEventListener('resize', updateDimensions)
         return () => window.removeEventListener('resize', updateDimensions)
     }, [])
@@ -82,7 +81,6 @@ function Thekendienst() {
 
     useEffect(() => {
         setLoading(true)
-
         fetch(
             `https://server-theklendienst.onrender.com/api_calendar?date=${selectedValue}`
         )
@@ -351,39 +349,43 @@ function Thekendienst() {
     return (
         <>
             <Container className="">
-                <LocaleProvider locale={locales.en_GB}>
-                    {width < 768 ? (
-                        <List
-                            style={{
-                                // backgroundColor: 'whitesmoke',
-                                padding: '10px',
-                                width: '100%',
-                            }}
-                            className="demo-loadmore-list"
-                            itemLayout="horizontal"
-                            loading={initLoading}
-                            dataSource={calendarData}
-                            renderItem={renderListItem}
-                            header={
-                                <Typography.Text className="fw-bold text-uppercase">
-                                    {moment(value, 'DD/MM/YYYY').format(
-                                        'MMMM'
-                                    ) + '  Thekendienst'}
-                                </Typography.Text>
-                            }
-                        />
-                    ) : (
-                        <Calendar
-                            value={value}
-                            onSelect={onSelect}
-                            onPanelChange={onPanelChange}
-                            headerRender={headerRender}
-                            dateCellRender={dateCellRender}
-                            locale={locale}
-                            defaultValue={moment(new Date(), 'DD/MM/YYYY')}
-                        />
-                    )}
-                </LocaleProvider>
+                {loading ? (
+                    <ListLoading />
+                ) : (
+                    <LocaleProvider locale={locales.en_GB}>
+                        {width < 768 ? (
+                            <List
+                                style={{
+                                    // backgroundColor: 'whitesmoke',
+                                    padding: '10px',
+                                    width: '100%',
+                                }}
+                                className="demo-loadmore-list"
+                                itemLayout="horizontal"
+                                loading={initLoading}
+                                dataSource={calendarData}
+                                renderItem={renderListItem}
+                                header={
+                                    <Typography.Text className="fw-bold text-uppercase">
+                                        {moment(value, 'DD/MM/YYYY').format(
+                                            'MMMM'
+                                        ) + '  Thekendienst'}
+                                    </Typography.Text>
+                                }
+                            />
+                        ) : (
+                            <Calendar
+                                value={value}
+                                onSelect={onSelect}
+                                onPanelChange={onPanelChange}
+                                headerRender={headerRender}
+                                dateCellRender={dateCellRender}
+                                locale={locale}
+                                defaultValue={moment(new Date(), 'DD/MM/YYYY')}
+                            />
+                        )}
+                    </LocaleProvider>
+                )}
             </Container>
             <Modal
                 title="Add to Calendar"
