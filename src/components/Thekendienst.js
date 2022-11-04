@@ -7,13 +7,10 @@ import {
     Input,
     Modal,
     Space,
-    Segmented,
-    notification,
     Avatar,
     List,
-    Skeleton,
     Typography,
-    Divider,
+    notification,
 } from 'antd'
 import './assets/css/thekendienst.css'
 import {
@@ -33,6 +30,7 @@ import LocaleProvider from 'antd/lib/locale-provider'
 import { locales } from 'moment'
 import SimpleButton from './SimpleButton'
 import ListLoading from './ListLoading'
+import MonthSelector from './MonthSelector'
 
 function Thekendienst() {
     const [user, setUser] = useState('')
@@ -48,6 +46,11 @@ function Thekendienst() {
     const [userIsMandatory, setUserIsMandatory] = useState('')
     const [width, setWindowWidth] = useState(0)
     const [initLoading, setInitLoading] = useState(true)
+    const [segmentedMonth, setSegmentedMonth] = useState(
+        moment(value, 'DD/MM/YYYY').format('MMMM')
+    )
+    const [actualMonthCalendar, setActualMonthCalendar] = useState([])
+    const [nextMonthCalendar, setNextMonthCalendar] = useState([])
 
     const openNotification = (name, date) => {
         notification.open({
@@ -79,10 +82,9 @@ function Thekendienst() {
         setWindowWidth(width)
     }
 
-    useEffect(() => {
-        setLoading(true)
+    const fetchMonth = (date, cond) => {
         fetch(
-            `https://server-theklendienst.onrender.com/api_calendar?date=${selectedValue}`
+            `https://server-theklendienst.onrender.com/api_calendar?date=${date}`
         )
             // fetch(`http://localhost:5000/api_calendar/?date=${selectedValue}`)
             .then((response) => {
@@ -92,7 +94,9 @@ function Thekendienst() {
                 throw response
             })
             .then((data) => {
-                setCalendarData(data)
+                cond ? setActualMonthCalendar(data) : setNextMonthCalendar(data)
+                cond && setCalendarData(data)
+
                 // console.log('List: ', calendarData)
             })
             .catch((error) => {
@@ -103,6 +107,12 @@ function Thekendienst() {
                 setInitLoading(false)
                 setLoading(false)
             })
+    }
+
+    useEffect(() => {
+        setLoading(true)
+        fetchMonth(selectedValue, true)
+        fetchMonth(moment().add(1, 'month').format('DD/MM/YYYY'), false)
     }, [])
 
     const showModal = (val) => {
@@ -143,8 +153,6 @@ function Thekendienst() {
                 })
                 .then((data) => {
                     setCalendarData(data)
-                    // console.log(data)
-                    // console.log('List: ', calendarData)
                 })
                 .catch((error) => {
                     setError(true)
@@ -225,6 +233,7 @@ function Thekendienst() {
     }
 
     const onSelect = (newValue) => {
+        //console.log(newValue)
         setValue(newValue)
         setSelectedValue(moment(newValue).format('DD/MM/YYYY'))
     }
@@ -241,8 +250,15 @@ function Thekendienst() {
                     : setAlertType('warning')
                 return el.name !== 'N/A' ? (
                     <>
-                        Datum: <strong>{selectedValue}</strong> Thekendienst:{' '}
-                        <strong>{el.name}</strong>
+                        Datum:{' '}
+                        <strong>
+                            {moment(selectedValue, 'DD/MM/YYYY').format(
+                                'dddd'
+                            ) +
+                                ' ' +
+                                selectedValue}
+                        </strong>{' '}
+                        Thekendienst: <strong>{el.name}</strong>
                     </>
                 ) : (
                     <>
@@ -264,6 +280,16 @@ function Thekendienst() {
                 />
             </>
         )
+    }
+
+    const changeMonthView = (val) => {
+        //If the month selected is the current month
+        moment().format('MMMM') === val
+            ? setCalendarData(actualMonthCalendar)
+            : setCalendarData(nextMonthCalendar)
+
+        setSelectedValue(moment().month(val).format('DD/MM/YYYY'))
+        onSelect(moment().month(val))
     }
 
     const headerRender = ({ value, type, onChange, onTypeChange }) => {
@@ -333,14 +359,10 @@ function Thekendienst() {
                     </div>
                 </div>
                 <div className="m-4 d-flex justify-content-center align-items-center gap-2">
-                    <Segmented
-                        defaultValue={moment(value, 'DD/MM/YYYY').format(
-                            'MMMM'
-                        )}
-                        options={[
-                            moment(value, 'DD/MM/YYYY').format('MMMM'),
-                            // 'Next Month',
-                        ]}
+                    <MonthSelector
+                        value={value}
+                        changeMonthView={changeMonthView}
+                        segmentedMonth={segmentedMonth}
                     />
                 </div>
             </>
@@ -357,7 +379,6 @@ function Thekendienst() {
                             <List
                                 style={{
                                     // backgroundColor: 'whitesmoke',
-                                    padding: '10px',
                                     width: '100%',
                                 }}
                                 className="demo-loadmore-list"
@@ -366,11 +387,20 @@ function Thekendienst() {
                                 dataSource={calendarData}
                                 renderItem={renderListItem}
                                 header={
-                                    <Typography.Text className="fw-bold text-uppercase">
-                                        {moment(value, 'DD/MM/YYYY').format(
-                                            'MMMM'
-                                        ) + '  Thekendienst'}
-                                    </Typography.Text>
+                                    <>
+                                        <div className="m-1 d-flex justify-content-around align-items-center">
+                                            <Typography.Title level={5}>
+                                                Thekendienst plan
+                                            </Typography.Title>
+                                            <MonthSelector
+                                                value={value}
+                                                changeMonthView={
+                                                    changeMonthView
+                                                }
+                                                segmentedMonth={segmentedMonth}
+                                            />
+                                        </div>
+                                    </>
                                 }
                             />
                         ) : (
