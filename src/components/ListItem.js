@@ -52,7 +52,7 @@ const ListItem = ({ date, name, showModal }) => {
                     {!isClosed ? (
                         <>
                             <Avatar
-                                size={40}
+                                size={30}
                                 style={{
                                     backgroundColor:
                                         name !== 'N/A' ? 'skyblue' : 'orange',
@@ -68,14 +68,14 @@ const ListItem = ({ date, name, showModal }) => {
                         </>
                     ) : (
                         <Avatar
-                            size={40}
+                            size={30}
                             style={{
                                 backgroundColor: '#339900 ',
                                 color: 'black',
                             }}
                         >
                             <CloseCircleOutlined
-                                style={{ fontSize: 'px', color: 'white' }}
+                                style={{ fontSize: '20px', color: 'white' }}
                             />
                         </Avatar>
                     )}
@@ -93,30 +93,6 @@ const ListItem = ({ date, name, showModal }) => {
                                 : 'Unbelegt'
                             : 'Poolcity ist Zu'}
                     </Typography.Text>
-                    {/* <Space
-                        direction="vertical"
-                        align="center"
-                        style={{ marginLeft: '10px' }}
-                    >
-                        <Typography.Text
-                            strong={true}
-                            style={{
-                                color: 'black',
-                                fontSize: 'min(14px)',
-                            }}
-                        >
-                            {moment(date, 'DD/MM/YYYY').format('dddd')}
-                        </Typography.Text>
-                        <Typography.Text
-                            strong={true}
-                            style={{
-                                color: '#696969',
-                                fontSize: 'min(14px)',
-                            }}
-                        >
-                            {moment(date, 'DD/MM/YYYY').format('DD/MM/YYYY')}
-                        </Typography.Text>
-                    </Space> */}
                 </Space>
             </List.Item>
         </div>
