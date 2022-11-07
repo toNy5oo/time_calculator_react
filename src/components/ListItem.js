@@ -93,7 +93,7 @@ const ListItem = ({ date, name, showModal }) => {
                             ? name !== 'N/A'
                                 ? name
                                 : 'Unbelegt'
-                            : 'Poolcity ist Zu'}
+                            : 'Pooltime ist Zu'}
                     </Typography.Text>
                 </Space>
             </List.Item>
