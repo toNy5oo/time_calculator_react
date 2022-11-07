@@ -8,8 +8,15 @@ import NavDropdown from 'react-bootstrap/NavDropdown'
 import Offcanvas from 'react-bootstrap/Offcanvas'
 import { Link } from 'react-router-dom'
 import logo from '../logo.png'
+import React, { useState, useEffect } from 'react'
 
 function BootNavbar() {
+    const [dateState, setDateState] = useState(new Date())
+    useEffect(() => {
+        setInterval(() => {
+            setDateState(new Date())
+        }, 60000)
+    }, [])
     return (
         <>
             <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -39,6 +46,24 @@ function BootNavbar() {
                                 </Link>
                             </Nav.Link>
                         </Nav>
+                    </Navbar.Collapse>
+                    <Navbar.Collapse className="justify-content-end">
+                        <Navbar.Text>
+                            <h5
+                                style={{
+                                    // margin: '20px auto',
+                                    // padding: '15px 8px',
+                                    color: '#fff',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {dateState.toLocaleString('en-US', {
+                                    hour: 'numeric',
+                                    minute: 'numeric',
+                                    hour12: true,
+                                })}
+                            </h5>
+                        </Navbar.Text>
                     </Navbar.Collapse>
                 </Container>
             </Navbar>

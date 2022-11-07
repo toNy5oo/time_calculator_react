@@ -2,168 +2,129 @@ import { Col, Row } from 'antd'
 import TimerHeader from './TimerHeader'
 import Table from './Table'
 import React, { useState, useEffect } from 'react'
-import { message } from 'antd'
+import { notification } from 'antd'
 import moment from 'moment'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { SmileOutlined } from '@ant-design/icons'
+import { DEFAULT_TEMPLATE } from './assets/data/tablesArray'
 
-const DEFAULT_TEMPLATE = [
-    {
-        tableNumber: 1,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 2,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 3,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 4,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 5,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 6,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 7,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 8,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 9,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 10,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-    {
-        tableNumber: 147,
-        isActive: false,
-        start: 0,
-        end: 0,
-        played: 0,
-        discount: false,
-        toPay: 0,
-    },
-]
+const closeTableNotification = (num) => {
+    notification.open({
+        message: `Tisch ${num} ist gespeichert`,
+        description: 'This is the content of the notification.',
+        icon: <SmileOutlined style={{ color: '#108ee9' }} />,
+    })
+}
+
+const holdTableNotification = (num, message, desc) => {
+    notification.open({
+        message: `${message}`,
+        description: `${desc}`,
+    })
+}
 
 function Timer() {
-    const [show, setShow] = useState(false)
     const [parent] = useAutoAnimate(/* optional config */)
     const [tables, setTables] = React.useState(
         localStorage.getItem('tables')
             ? JSON.parse(localStorage.getItem('tables'))
             : DEFAULT_TEMPLATE
     )
-
+    const [holdTables, setHoldTables] = React.useState(
+        localStorage.getItem('holdtables')
+            ? JSON.parse(localStorage.getItem('holdtables'))
+            : []
+    )
+    const [activeTables, setActiveTables] = useState(0)
     const [isEmpty, setIsEmpty] = useState(true)
 
+    const countActiveTables = () => tables.filter((obj) => obj.isActive)
+
     useEffect(() => {
-        tables.forEach((table) => {
-            table.isActive && setIsEmpty(false)
-        })
-    }, [])
+        tables.map((table) => table.isActive && setIsEmpty(false))
+        setActiveTables(countActiveTables().length)
+        console.log(tables)
+    }, [tables, holdTables])
 
     useEffect(() => {
         localStorage.setItem('tables', JSON.stringify(tables))
-    }, [tables])
+        localStorage.setItem('holdtables', JSON.stringify(holdTables))
+    }, [tables, holdTables])
 
     /**
      * Retrieving JSON string from localStorage to restore the state
      */
 
+    const closeHoldTable = (num) => {
+        holdTableNotification(
+            num,
+            'Tisch ' + num,
+            'Table has been successfully closed'
+        )
+        setHoldTables((state) =>
+            state.filter((e) => e.tableNumber !== parseInt(num))
+        )
+    }
+
+    //Deactivate the table but keeps the info
+    const addHoldTable = (tableNumber) => {
+        console.log(
+            holdTables.filter((t) => t.tableNumber === parseInt(tableNumber))
+                .length
+        )
+        if (
+            holdTables.filter((t) => t.tableNumber === parseInt(tableNumber))
+                .length === 0
+        ) {
+            const obj = tables.filter(
+                (t) => t.tableNumber === parseInt(tableNumber)
+            )
+
+            if (obj[0].start !== 0 && obj[0].end !== 0) {
+                obj[0].start = moment(obj[0].start).format('HH:mm')
+                obj[0].end = moment(obj[0].end).format('HH:mm')
+                setHoldTables((state) => [...state, ...obj])
+                closeTable(tableNumber)
+            } else {
+                holdTableNotification(
+                    tableNumber,
+                    'Tisch ' + tableNumber + " can't be put on hold",
+                    "Table doesn't have both a starting and ending time"
+                )
+            }
+        } else
+            holdTableNotification(
+                tableNumber,
+                'Tisch ' + tableNumber + " can't be put on hold",
+                'There is already a previous table with same number pending. Please close that one before putting another one in hold'
+            )
+    }
+
     //Add table from view
     const openTable = (tableNumber) => {
-        // 👇️ passing function to setData method
-        setTables((prevState) => {
-            const newState = prevState.map((obj) => {
-                // 👇️ if id equals tableNumber
-                if (obj.tableNumber === parseInt(tableNumber)) {
-                    console.log('Table activated: ' + obj)
-                    return { ...obj, isActive: true }
+        setTables((state) => {
+            const list = state.map((item) => {
+                // 👇️ Get the right table obj
+                if (item.tableNumber === parseInt(tableNumber)) {
+                    return { ...item, isActive: true }
                 }
-                // 👇️ otherwise return object as is
-                return obj
+                return item
             })
-            return newState
+            return list
         })
-        setIsEmpty(false)
     }
 
     //Remove table from view
     const closeTable = (tableNumber, showMessage) => {
-        setShow(true)
-        if (showMessage)
-            message.info('Tisch ' + tableNumber + ' ist jetzt gespeichert')
-        // 👇️ passing function to setData method
-        setTables((prevState) => {
-            const newState = prevState.map((obj) => {
-                // 👇️ if id equals 2, update country property
-                if (obj.tableNumber === tableNumber) {
+        // setShow(true)
+        showMessage && closeTableNotification(tableNumber)
+
+        // 👇️ Get the right table obj
+        setTables((state) => {
+            const list = state.map((item) => {
+                if (item.tableNumber === parseInt(tableNumber)) {
                     return {
-                        ...obj,
-                        tableNumber: tableNumber,
+                        ...item,
                         isActive: false,
                         start: 0,
                         end: 0,
@@ -172,12 +133,10 @@ function Timer() {
                         toPay: 0,
                     }
                 }
-                // 👇️ otherwise return object as is
-                return obj
+                return item
             })
-            return newState
+            return list
         })
-        setIsEmpty(!tables.some((table) => table.isActive === 1))
     }
 
     //Update table on start time and minPlayed
@@ -202,7 +161,6 @@ function Timer() {
                 // 👇️ otherwise return object as is
                 return obj
             })
-
             return newState
         })
     }
@@ -224,10 +182,8 @@ function Timer() {
                 // 👇️ otherwise return object as is
                 return obj
             })
-
             return newState
         })
-        // localStorage.setItem('tables', JSON.stringify(tables))
     }
 
     /**
@@ -241,7 +197,6 @@ function Timer() {
             const duration = Math.ceil(
                 moment.duration(end.diff(start, 'seconds') / 60)
             )
-            console.log('Dur ' + duration)
             return [parseTime(duration), duration]
         } else return 0
     }
@@ -292,18 +247,17 @@ function Timer() {
                 // 👇️ otherwise return object as is
                 return obj
             })
-
             return newState
         })
-        // localStorage.setItem('tables', JSON.stringify(tables))
     }
 
     //Gets every table and closes it
     const resetAllTables = () => {
-        tables.forEach((t, i) => {
+        tables.map((t, i) => {
             closeTable(i + 1, false)
         })
         setIsEmpty(true)
+        setActiveTables(countActiveTables().length)
     }
 
     return (
@@ -312,6 +266,9 @@ function Timer() {
                 tables={tables}
                 openTable={openTable}
                 resetAllTables={resetAllTables}
+                activeTables={activeTables}
+                holdTables={holdTables}
+                closeHoldTable={closeHoldTable}
             />
             {isEmpty ? (
                 <Row justify="center" align="middle">
@@ -343,6 +300,7 @@ function Timer() {
                                         startTime={startTime}
                                         endTime={endTime}
                                         toggleDiscount={toggleDiscount}
+                                        addHoldTable={addHoldTable}
                                     />{' '}
                                 </Col>
                             )

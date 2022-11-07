@@ -3,9 +3,10 @@ import { Modal } from 'antd'
 import React, { useState } from 'react'
 import {
     UsergroupAddOutlined,
-    CloseCircleOutlined,
+    CloseOutlined,
     PercentageOutlined,
     HourglassOutlined,
+    PoweroffOutlined,
 } from '@ant-design/icons'
 import { Avatar, Card, TimePicker } from 'antd'
 import moment from 'moment'
@@ -27,7 +28,14 @@ function disabledRangeTime() {
     }
 }
 
-function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
+function Table({
+    table,
+    closeTable,
+    startTime,
+    endTime,
+    toggleDiscount,
+    addHoldTable,
+}) {
     const [sharedBill, setSharedBill] = useState('2')
 
     function handleChangeInput(val) {
@@ -99,15 +107,16 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
         </>
     )
 
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const showModal = () => {
-        setIsModalOpen(true)
+    const [isTotalModalOpen, setIsTotalModalOpen] = useState(false)
+
+    const showTotalModal = () => {
+        setIsTotalModalOpen(true)
     }
-    const handleOk = () => {
-        setIsModalOpen(false)
+    const handleTotalOk = () => {
+        setIsTotalModalOpen(false)
     }
-    const handleCancel = () => {
-        setIsModalOpen(false)
+    const handleTotalCancel = () => {
+        setIsTotalModalOpen(false)
     }
 
     return (
@@ -133,29 +142,46 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
             }
             actions={[
                 <Popconfirm
-                    title="Are you sure delete this task?"
+                    title="The table will be cleared and put in hold?"
                     okText="Yes"
                     cancelText="No"
-                    onConfirm={() => closeTable(table.tableNumber, true)}
+                    onConfirm={() => addHoldTable(table.tableNumber)}
                 >
-                    <CloseCircleOutlined key="close" style={{ color: 'red' }} />{' '}
+                    <PoweroffOutlined
+                        key="close"
+                        style={{ color: 'dark orange' }}
+                    />{' '}
                 </Popconfirm>,
                 <UsergroupAddOutlined
                     key="share"
-                    onClick={table.toPay && showModal}
-                    style={{ fontSize: '20px', flex: 1, alignItems: 'center' }}
+                    onClick={table.toPay && showTotalModal}
+                    style={{
+                        fontSize: '20px',
+                        //  flex: 1,
+                        //  alignItems: 'center'
+                    }}
                 />,
                 <div className={`fw-bold ${table.toPay && 'text-primary'}`}>
                     {' '}
                     {table.toPay}€{' '}
                 </div>,
+
+                <Popconfirm
+                    title="Are you sure delete this task?"
+                    okText="Yes"
+                    cancelText="No"
+                    onConfirm={() => closeTable(table.tableNumber, true)}
+                >
+                    <CloseOutlined key="close" style={{ color: 'red' }} />{' '}
+                </Popconfirm>,
             ]}
         >
+            {/* Inside parts of the card */}
             <Meta
                 className="mb-2 mt-1"
                 avatar={
                     <HourglassOutlined
-                        style={{ fontSize: '20px', color: '#666' }}
+                        style={{ fontSize: '25px', color: '#666' }}
                     />
                 }
                 title={<div className="text-muted"> Zeit </div>}
@@ -165,7 +191,7 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
                 className="my-2"
                 avatar={
                     <PercentageOutlined
-                        style={{ fontSize: '20px', color: '#666' }}
+                        style={{ fontSize: '25px', color: '#666' }}
                     />
                 }
                 title={<div className="text-muted"> Rabatt </div>}
@@ -173,9 +199,9 @@ function Table({ table, closeTable, startTime, endTime, toggleDiscount }) {
             />{' '}
             <Modal
                 title={`Geteilte Rechnung | Tisch ${table.tableNumber} - ${table.toPay}`}
-                open={isModalOpen}
-                onOk={handleOk}
-                onCancel={handleCancel}
+                open={isTotalModalOpen}
+                onOk={handleTotalOk}
+                onCancel={handleTotalCancel}
             >
                 <div className="d-flex flex-column justify-content-center align-items-center">
                     <div>
