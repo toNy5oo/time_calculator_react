@@ -7,3 +7,11 @@
 svg {
     vertical-align: baseline;
 }
+
+.btn-orange {
+    background-color: orange !important;
+}
+
+.btn-orange:hover {
+    color: black !important;
+}

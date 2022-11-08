@@ -59,7 +59,7 @@ function Timer() {
         holdTableNotification(
             num,
             'Tisch ' + num,
-            'Table has been successfully closed'
+            'Tisch wurde abgerechnet und zurückgesetzt.'
         )
         setHoldTables((state) =>
             state.filter((e) => e.tableNumber !== parseInt(num))
@@ -88,15 +88,17 @@ function Timer() {
             } else {
                 holdTableNotification(
                     tableNumber,
-                    'Tisch ' + tableNumber + " can't be put on hold",
-                    "Table doesn't have both a starting and ending time"
+                    'Tisch ' + tableNumber + ' kann nicht verschoben werden.',
+                    'Es fehlen entweder Start- oder Endzeit.'
                 )
             }
         } else
             holdTableNotification(
                 tableNumber,
-                'Tisch ' + tableNumber + " can't be put on hold",
-                'There is already a previous table with same number pending. Please close that one before putting another one in hold'
+                'Tisch ' + tableNumber + ' kann nicht verschoben werden.',
+                'Es befindet sich bereits ein Tisch ' +
+                    tableNumber +
+                    ' in offene Rechnungen. Dieser Tisch muss zuerst abgerechnet werden.'
             )
     }
 

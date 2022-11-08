@@ -1,5 +1,12 @@
 import { Divider, InputNumber, Popconfirm, Space, Switch, Tag } from 'antd'
 import { Modal } from 'antd'
+import {
+    faMoneyBillWave,
+    faToggleOff,
+    faHourglassHalf,
+    faPercent,
+    faPeopleGroup,
+} from '@fortawesome/free-solid-svg-icons'
 import React, { useState } from 'react'
 import {
     UsergroupAddOutlined,
@@ -10,6 +17,7 @@ import {
 } from '@ant-design/icons'
 import { Avatar, Card, TimePicker } from 'antd'
 import moment from 'moment'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const { Meta } = Card
 const format = 'HH:mm'
@@ -142,18 +150,19 @@ function Table({
             }
             actions={[
                 <Popconfirm
-                    title="The table will be cleared and put in hold?"
+                    title="Der Tisch wird wieder verfügbar, die offene Zahlung findest du in offene Rechnungen"
                     okText="Yes"
                     cancelText="No"
                     onConfirm={() => addHoldTable(table.tableNumber)}
                 >
-                    <PoweroffOutlined
+                    <FontAwesomeIcon icon={faToggleOff} />
+                    {/* <PoweroffOutlined
                         key="close"
                         style={{ color: 'dark orange' }}
-                    />{' '}
+                    />{' '} */}
                 </Popconfirm>,
-                <UsergroupAddOutlined
-                    key="share"
+                <FontAwesomeIcon
+                    icon={faPeopleGroup}
                     onClick={table.toPay && showTotalModal}
                     style={{
                         fontSize: '20px',
@@ -161,10 +170,10 @@ function Table({
                         //  alignItems: 'center'
                     }}
                 />,
-                <div className={`fw-bold ${table.toPay && 'text-primary'}`}>
-                    {' '}
-                    {table.toPay}€{' '}
-                </div>,
+                // <div className={`fw-bold ${table.toPay && 'text-primary'}`}>
+                //     {' '}
+                //     {table.toPay}€{' '}
+                // </div>,
 
                 <Popconfirm
                     title="Are you sure delete this task?"
@@ -172,7 +181,17 @@ function Table({
                     cancelText="No"
                     onConfirm={() => closeTable(table.tableNumber, true)}
                 >
-                    <CloseOutlined key="close" style={{ color: 'red' }} />{' '}
+                    <FontAwesomeIcon icon={faMoneyBillWave} />
+                    {table.toPay !== 0 && (
+                        <span
+                            className={`fw-bold ${
+                                table.toPay && 'text-primary mx-2'
+                            }`}
+                        >
+                            {table.toPay !== 0 && table.toPay}€
+                        </span>
+                    )}
+                    {/* <CloseOutlined key="close" style={{ color: 'red' }} />{' '} */}
                 </Popconfirm>,
             ]}
         >
@@ -180,9 +199,13 @@ function Table({
             <Meta
                 className="mb-2 mt-1"
                 avatar={
-                    <HourglassOutlined
+                    <FontAwesomeIcon
+                        icon={faHourglassHalf}
                         style={{ fontSize: '25px', color: '#666' }}
                     />
+                    // <HourglassOutlined
+                    //     style={{ fontSize: '25px', color: '#666' }}
+                    // />
                 }
                 title={<div className="text-muted"> Zeit </div>}
                 description={descCardTime}
@@ -190,7 +213,8 @@ function Table({
             <Meta
                 className="my-2"
                 avatar={
-                    <PercentageOutlined
+                    <FontAwesomeIcon
+                        icon={faPercent}
                         style={{ fontSize: '25px', color: '#666' }}
                     />
                 }

@@ -128,7 +128,7 @@ function TimerHeader({
                                     icon={<PlusCircleFilled />}
                                     placement="bottom"
                                 >
-                                    Add table
+                                    Tisch hinzufügen
                                 </Button>
                             </a>
                         </Dropdown>
@@ -136,7 +136,7 @@ function TimerHeader({
                     <Navbar.Brand></Navbar.Brand>
                     <Navbar.Brand>
                         <Popconfirm
-                            title="Are you sure to reset all the tables?"
+                            title="Bist du sicher, dass du alle Tische zurücksetzen möchtest?"
                             icon={
                                 <QuestionCircleOutlined
                                     style={{ color: 'red' }}
@@ -147,12 +147,14 @@ function TimerHeader({
                             cancelText="Nein"
                             onConfirm={() => resetAllTables()}
                         >
-                            <Button danger>Reset all tables</Button>
+                            <Button danger>Tische zurücksetzen</Button>
                         </Popconfirm>
                     </Navbar.Brand>
                     <Navbar.Brand>
                         <Badge count={holdTables.length}>
-                            <Button onClick={showDrawer}>Show Hold</Button>
+                            <Button onClick={showDrawer} className="btn-orange">
+                                Offene Rechnungen
+                            </Button>
                         </Badge>
                     </Navbar.Brand>
                 </Space>
@@ -164,7 +166,7 @@ function TimerHeader({
     const alertMessage = () => {
         return (
             <Typography.Text level={2}>
-                Tables active: <strong>{activeTables}</strong>
+                Besetzte Tische: <strong>{activeTables}</strong>
             </Typography.Text>
         )
     }
@@ -223,7 +225,7 @@ function TimerHeader({
                 </div>{' '}
             </Modal>{' '}
             <Drawer
-                title="Tables on hold"
+                title="Offene Rechnungen"
                 placement={'right'}
                 closable={false}
                 onClose={onClose}
@@ -238,7 +240,7 @@ function TimerHeader({
                         <List.Item
                             actions={[
                                 <Popconfirm
-                                    title="Are you sure to delete this task?"
+                                    title="Wurde die Tischrechnung bezahlt?"
                                     placement={'left'}
                                     onConfirm={() =>
                                         closeHoldTable(item.tableNumber)
