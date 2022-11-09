@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import {
     QuestionCircleOutlined,
-    PlusOutlined,
     PlusCircleFilled,
     CheckOutlined,
     ExclamationCircleOutlined,
-    HourglassOutlined,
-    EuroOutlined,
-    ClockCircleOutlined,
 } from '@ant-design/icons'
+import {
+    faStopwatch,
+    faPeopleGroup,
+    faHourglass,
+    faPercent,
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     Row,
     Dropdown,
@@ -33,6 +36,7 @@ import {
 import Container from 'react-bootstrap/Container'
 import { Navbar } from 'react-bootstrap'
 import { moment } from 'moment/moment'
+import SharedBillButton from './SharedBillButton'
 
 function TimerHeader({
     tables,
@@ -42,45 +46,21 @@ function TimerHeader({
     holdTables,
     closeHoldTable,
 }) {
-    const [holdTableClicked, setHoldTableClicked] = useState({})
-    const [isHoldModalOpen, setIsHoldModalOpen] = useState(false)
+    const [holdTableClicked, setHoldTableClicked] = useState(0)
     const [sharedBill, setSharedBill] = useState('2')
     const [open, setOpen] = useState(false)
+    const [showSharedBill, setShowSharedBill] = useState(false)
 
     //Drawer visibility methods
     const showDrawer = () => {
         setOpen(true)
     }
     const onClose = () => {
-        setOpen(false)
-    }
-
-    const confirm = () => {
-        Modal.destroyAll()
-        Modal.confirm({
-            title: 'Confirm close table',
-            icon: <ExclamationCircleOutlined />,
-            content: 'Bla bla ...',
-            okText: 'Close',
-            cancelText: 'Back',
-            onOk: closeModals,
-        })
-    }
-
-    function closeModals() {
-        onClose()
-        closeHoldTable(holdTableClicked.tableNumber)
+        setOpen(false, setHoldTableClicked(0))
     }
 
     function handleChangeInput(val) {
         setSharedBill(val)
-    }
-
-    const handleHoldOk = () => {
-        setIsHoldModalOpen(false)
-    }
-    const handleHoldCancel = () => {
-        setIsHoldModalOpen(false)
     }
 
     const onSelectedItems = ({ key }) => {
@@ -150,13 +130,18 @@ function TimerHeader({
                             <Button danger>Tische zurücksetzen</Button>
                         </Popconfirm>
                     </Navbar.Brand>
-                    <Navbar.Brand>
-                        <Badge count={holdTables.length}>
-                            <Button onClick={showDrawer} className="btn-orange">
-                                Offene Rechnungen
-                            </Button>
-                        </Badge>
-                    </Navbar.Brand>
+                    {holdTables.length > 0 && (
+                        <Navbar.Brand>
+                            <Badge count={holdTables.length}>
+                                <Button
+                                    onClick={showDrawer}
+                                    className="btn-orange"
+                                >
+                                    Offene Rechnungen
+                                </Button>
+                            </Badge>
+                        </Navbar.Brand>
+                    )}
                 </Space>
             </Container>
         )
@@ -188,50 +173,15 @@ function TimerHeader({
                     </Col>
                 </Row>
             </Container>
-            <Modal
-                title={`Geteilte Rechnung | Tisch ${holdTableClicked.tableNumber} - ${holdTableClicked.toPay}`}
-                open={isHoldModalOpen}
-                onOk={handleHoldOk}
-                onCancel={handleHoldCancel}
-                footer={[
-                    <Button
-                        key="click"
-                        type="primary"
-                        icon={<CheckOutlined />}
-                        onClick={confirm}
-                    >
-                        Close table
-                    </Button>,
-                ]}
-            >
-                <div className="d-flex flex-column justify-content-center align-items-center">
-                    <div>
-                        <p> Anzahl Personen </p>{' '}
-                        <InputNumber
-                            onStep={handleChangeInput}
-                            min={2}
-                            defaultValue={2}
-                        />{' '}
-                    </div>{' '}
-                    <Divider> Total per person </Divider>{' '}
-                    <div>
-                        <Tag
-                            color="blue"
-                            style={{ fontSize: '20px', padding: '10px' }}
-                        >
-                            €{(holdTableClicked.toPay / sharedBill).toFixed(2)}{' '}
-                        </Tag>{' '}
-                    </div>{' '}
-                </div>{' '}
-            </Modal>{' '}
+
             <Drawer
                 title="Offene Rechnungen"
-                placement={'right'}
+                placement={'top'}
                 closable={false}
                 onClose={onClose}
                 open={open}
                 key={'right'}
-                width={window.innerWidth < 1024 ? '70%' : '35%'}
+                height={'46%'}
             >
                 <List
                     itemLayout="horizontal"
@@ -239,13 +189,65 @@ function TimerHeader({
                     renderItem={(item) => (
                         <List.Item
                             actions={[
+                                !showSharedBill ? (
+                                    <SharedBillButton
+                                        setHoldTableClicked={
+                                            setHoldTableClicked
+                                        }
+                                        number={item.tableNumber}
+                                        setShowSharedBill={setShowSharedBill(
+                                            true
+                                        )}
+                                        icon={faPeopleGroup}
+                                    />
+                                ) : holdTableClicked === item.tableNumber ? (
+                                    <div className="d-flex flex-row justify-content-center align-items-center">
+                                        <InputNumber
+                                            onStep={handleChangeInput}
+                                            prefix={
+                                                <FontAwesomeIcon
+                                                    icon={faPeopleGroup}
+                                                    className="mx-2"
+                                                />
+                                            }
+                                            controls="true"
+                                            min={2}
+                                            defaultValue={2}
+                                        />{' '}
+                                        <div>
+                                            <Tag
+                                                color="blue"
+                                                style={{
+                                                    fontSize: '16px',
+                                                    padding: '5px',
+                                                }}
+                                            >
+                                                €
+                                                {(
+                                                    item.toPay / sharedBill
+                                                ).toFixed(2)}{' '}
+                                            </Tag>{' '}
+                                        </div>{' '}
+                                    </div>
+                                ) : (
+                                    <SharedBillButton
+                                        setHoldTableClicked={
+                                            setHoldTableClicked
+                                        }
+                                        number={item.tableNumber}
+                                        setShowSharedBill={setShowSharedBill(
+                                            true
+                                        )}
+                                        icon={faPeopleGroup}
+                                    />
+                                ),
+
                                 <Popconfirm
                                     title="Wurde die Tischrechnung bezahlt?"
                                     placement={'left'}
                                     onConfirm={() =>
                                         closeHoldTable(item.tableNumber)
                                     }
-                                    // onCancel={cancel}
                                     okText="Yes"
                                     cancelText="No"
                                 >
@@ -265,26 +267,29 @@ function TimerHeader({
                                     />
                                 }
                                 title={
-                                    <div className="mx-3 d-flex justify-content-between align-items-center">
-                                        Tisch {item.tableNumber}
-                                        {<strong>€ {item.toPay}</strong>}
-                                    </div>
-                                }
-                                description={
                                     <>
+                                        <div className="mx-3 d-flex justify-content-start align-items-center fw-semibold">
+                                            Tisch {item.tableNumber}
+                                            <Divider type="vertical">€</Divider>
+                                            <div className="text-primary fw-bold">
+                                                € {item.toPay}
+                                            </div>
+                                        </div>
                                         <Space className="my-2 d-flex justify-content-start align-items-center">
                                             <div>
-                                                <HourglassOutlined
+                                                <FontAwesomeIcon
+                                                    icon={faHourglass}
                                                     style={{
+                                                        fontSize: '14px',
                                                         color: 'darkorange',
-                                                        fontSize: '16px',
                                                     }}
                                                     className="mx-2"
                                                 />
                                                 {item.start} : {item.end}
                                             </div>
                                             <div>
-                                                <ClockCircleOutlined
+                                                <FontAwesomeIcon
+                                                    icon={faStopwatch}
                                                     style={{
                                                         color: 'purple',
                                                         fontSize: '16px',
@@ -294,14 +299,15 @@ function TimerHeader({
                                                 {item.played}
                                             </div>
                                             <div>
-                                                <EuroOutlined
+                                                <FontAwesomeIcon
+                                                    icon={faPercent}
                                                     style={{
                                                         color: 'green',
                                                         fontSize: '16px',
                                                     }}
                                                     className="mx-2"
                                                 />
-                                                {item.toPay}
+                                                {item.discount ? 'Ja' : 'Nein'}
                                             </div>
                                         </Space>
                                     </>
