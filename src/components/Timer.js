@@ -256,8 +256,9 @@ function Timer() {
     //Gets every table and closes it
     const resetAllTables = () => {
         tables.map((t, i) => {
-            closeTable(i + 1, false)
+            i !== 10 ? closeTable(i + 1, false) : closeTable(147, false)
         })
+        setHoldTables([])
         setIsEmpty(true)
         setActiveTables(countActiveTables().length)
     }
