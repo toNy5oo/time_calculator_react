@@ -100,47 +100,35 @@ function TimerHeader({
         return (
             <Container className="d-flex justify-content-center align-items-center">
                 <Space>
-                    <Navbar.Brand>
-                        <Dropdown overlay={menu}>
-                            <a href="#" onClick={(e) => e.preventDefault()}>
-                                <Button
-                                    type="primary"
-                                    icon={<PlusCircleFilled />}
-                                    placement="bottom"
-                                >
-                                    Tisch hinzufügen
-                                </Button>
-                            </a>
-                        </Dropdown>
-                    </Navbar.Brand>
-                    <Navbar.Brand></Navbar.Brand>
-                    <Navbar.Brand>
-                        <Popconfirm
-                            title="Bist du sicher, dass du alle Tische zurücksetzen möchtest?"
-                            icon={
-                                <QuestionCircleOutlined
-                                    style={{ color: 'red' }}
-                                />
-                            }
-                            placement="bottom"
-                            okText="Ja"
-                            cancelText="Nein"
-                            onConfirm={() => resetAllTables()}
-                        >
-                            <Button danger>Tische zurücksetzen</Button>
-                        </Popconfirm>
-                    </Navbar.Brand>
+                    <Dropdown overlay={menu}>
+                        <a href="#" onClick={(e) => e.preventDefault()}>
+                            <Button
+                                type="primary"
+                                icon={<PlusCircleFilled />}
+                                placement="bottom"
+                            >
+                                Tisch hinzufügen
+                            </Button>
+                        </a>
+                    </Dropdown>
+                    <Popconfirm
+                        title="Bist du sicher, dass du alle Tische zurücksetzen möchtest?"
+                        icon={
+                            <QuestionCircleOutlined style={{ color: 'red' }} />
+                        }
+                        placement="bottom"
+                        okText="Ja"
+                        cancelText="Nein"
+                        onConfirm={() => resetAllTables()}
+                    >
+                        <Button danger>Tische zurücksetzen</Button>
+                    </Popconfirm>
                     {holdTables.length > 0 && (
-                        <Navbar.Brand>
-                            <Badge count={holdTables.length}>
-                                <Button
-                                    onClick={showDrawer}
-                                    className="btn-orange"
-                                >
-                                    Offene Rechnungen
-                                </Button>
-                            </Badge>
-                        </Navbar.Brand>
+                        <Badge count={holdTables.length}>
+                            <Button onClick={showDrawer} className="btn-orange">
+                                Offene Rechnungen
+                            </Button>
+                        </Badge>
                     )}
                 </Space>
             </Container>

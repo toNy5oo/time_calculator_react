@@ -255,11 +255,15 @@ function Timer() {
 
     //Gets every table and closes it
     const resetAllTables = () => {
-        tables.map((t, i) => {
+        tables.forEach((t, i) => {
+            //If snooker table (has different table number)
             i !== 10 ? closeTable(i + 1, false) : closeTable(147, false)
         })
+        //Remove tables in hold
         setHoldTables([])
+
         setIsEmpty(true)
+        //Count active tables
         setActiveTables(countActiveTables().length)
     }
 
