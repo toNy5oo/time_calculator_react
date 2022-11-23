@@ -1,0 +1,25 @@
+.cashOutBtn{
+    color: green;
+    border: 1px solid green
+}
+
+.cashOutBtn:hover{
+    color: rgb(229, 229, 229);
+    border: 1px solid rgb(17, 129, 17);
+    background: rgb(17, 129, 17)
+}
+
+.addBtn{
+    color: orange;
+    border: 1px solid rgb(220, 154, 0)
+}
+
+.addBtn:hover{
+    color: rgb(229, 229, 229);
+    border: 1px solid rgb(229, 169, 31);
+    background: orange
+}
+
+.spaced{
+    margin: 20px 10px;
+}

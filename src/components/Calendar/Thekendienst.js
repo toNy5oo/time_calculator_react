@@ -12,7 +12,7 @@ import {
     Typography,
     notification,
 } from 'antd'
-import './assets/css/thekendienst.css'
+import '../assets/css/thekendienst.css'
 import {
     StopOutlined,
     PlusCircleOutlined,

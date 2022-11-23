@@ -108,7 +108,7 @@ function Table({
         <>
             <Space>
                 <Avatar
-                    src={require(`./assets/img/${table.tableNumber}ball.png`)}
+                    src={require(`../assets/img/${table.tableNumber}ball.png`)}
                 />
                 Tisch {table.tableNumber}{' '}
             </Space>{' '}

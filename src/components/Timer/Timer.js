@@ -6,7 +6,7 @@ import { notification } from 'antd'
 import moment from 'moment'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { SmileOutlined } from '@ant-design/icons'
-import { DEFAULT_TEMPLATE } from './assets/data/tablesArray'
+import { DEFAULT_TEMPLATE } from '../../components/assets/data/tablesArray'
 
 const closeTableNotification = (num) => {
     notification.open({

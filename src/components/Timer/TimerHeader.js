@@ -73,7 +73,7 @@ function TimerHeader({
             <Space align="center">
                 Tisch
                 <Avatar
-                    src={require(`./assets/img/${num}ball.png`)}
+                    src={require(`../assets/img/${num}ball.png`)}
                     size="small"
                     style={{ margin: '2px' }}
                 />
@@ -251,7 +251,7 @@ function TimerHeader({
                             <List.Item.Meta
                                 avatar={
                                     <Avatar
-                                        src={require(`./assets/img/${item.tableNumber}ball.png`)}
+                                        src={require(`../assets/img/${item.tableNumber}ball.png`)}
                                     />
                                 }
                                 title={

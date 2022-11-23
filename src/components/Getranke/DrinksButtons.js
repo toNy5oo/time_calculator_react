@@ -16,20 +16,32 @@ import {
 } from 'antd'
 import React from 'react'
 import {
+    faBeerMugEmpty,
+    faPizzaSlice,
+    faGlassWater,
+    faMartiniGlass,
+    faXmark
+} from '@fortawesome/free-solid-svg-icons'
+import {
     QuestionCircleOutlined,
     PlusCircleFilled,
+    PlusOutlined,
     CloseOutlined,
     CheckOutlined,
     ExclamationCircleOutlined,
 } from '@ant-design/icons'
 // import { beers, spirits, softs, extras, prices } from './assets/data/drinkList'
-import { DRINKS as drinklist } from './assets/data/drinkList'
+import { DRINKS as drinklist } from '../assets/data/drinkList'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import DropdownButton from './DropdownButton'
 
 const DrinksButtons = ({
+    userSelected,
     resetRowDetails,
     setAddToUser,
     addToUser,
     addDrinksToUser,
+    showNotification
 }) => {
     //Menu
     const menu = (items) => (
@@ -37,56 +49,44 @@ const DrinksButtons = ({
             items={items}
             onClick={(e) => {
                 const drink = drinklist.filter((d) => d.key === e.key)
-                setAddToUser((prevState) => [...prevState, ...drink])
+                //Add the standard amount of drinks = 1
+                drink[0].amount = 1
+                //Add the ID of the selected user
+                drink[0].uid = userSelected;
+                //Add to the list of drinks to add to the current selected User
+                addToUser.findIndex(d => d.key === drink[0].key) === -1 
+                ? (setAddToUser((prevState) => [...prevState, ...drink]))
+                : showNotification('Drink already added', drink[0].label + ' is already present in the list of drinks to add.')
             }}
         />
     )
 
     return (
         <Space>
-            <Button onClick={resetRowDetails}>
-                <CloseOutlined />
-            </Button>
+            <a onClick={resetRowDetails} style={{color: 'red', marginRight: '10px'}}>
+            <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
+            </a>
             <Dropdown overlay={menu(drinklist.map((d) => d.cat === 1 && d))}>
                 <a href="#" onClick={(e) => e.preventDefault()}>
-                    <Button icon={<PlusCircleFilled />} placement="bottom">
-                        Biere
-                    </Button>
+                <DropdownButton icon={faBeerMugEmpty}></DropdownButton>
                 </a>
             </Dropdown>
             <Dropdown overlay={menu(drinklist.map((d) => d.cat === 2 && d))}>
                 <a href="#" onClick={(e) => e.preventDefault()}>
-                    <Button
-                        // type="primary"
-                        icon={<PlusCircleFilled />}
-                        placement="bottom"
-                    >
-                        Soft
-                    </Button>
+                    <DropdownButton icon={faGlassWater}></DropdownButton>
                 </a>
             </Dropdown>
             <Dropdown overlay={menu(drinklist.map((d) => d.cat === 3 && d))}>
                 <a href="#" onClick={(e) => e.preventDefault()}>
-                    <Button
-                        // type="primary"
-                        icon={<PlusCircleFilled />}
-                        placement="bottom"
-                    >
-                        Spirit
-                    </Button>
+                <DropdownButton icon={faMartiniGlass}></DropdownButton>
                 </a>
             </Dropdown>
             <Dropdown overlay={menu(drinklist.map((d) => d.cat === 4 && d))}>
                 <a href="#" onClick={(e) => e.preventDefault()}>
-                    <Button
-                        // type="primary"
-                        icon={<PlusCircleFilled />}
-                        placement="bottom"
-                    >
-                        Extra
-                    </Button>
+                <DropdownButton icon={faPizzaSlice}></DropdownButton>
                 </a>
             </Dropdown>
+            
         </Space>
     )
 }
