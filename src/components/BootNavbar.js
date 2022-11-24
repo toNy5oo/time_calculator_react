@@ -1,5 +1,5 @@
 import { Image } from 'react-bootstrap'
-import Button from 'react-bootstrap/Button'
+
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Nav from 'react-bootstrap/Nav'
@@ -9,6 +9,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas'
 import { Link } from 'react-router-dom'
 import logo from '../logo.png'
 import React, { useState, useEffect } from 'react'
+import { Button } from 'antd'
 
 function BootNavbar() {
     const [dateState, setDateState] = useState(new Date())
@@ -27,22 +28,24 @@ function BootNavbar() {
                         <Nav className="me-auto">
                             <Nav.Link href="#">
                                 <Link to="/" className="m-3">
-                                    Timer
+                                <Button type="primary" size='medium' shape='round'>Timer</Button>
                                 </Link>
                             </Nav.Link>
                             <Nav.Link href="#">
+                                
                                 <Link to="/getranke" className="m-3 text-right">
-                                    Getränke
+                                <Button type="primary"  size='medium' shape='round'>Getränke</Button>
                                 </Link>
+                                
                             </Nav.Link>
-                            <Nav.Link href="#">
+                            {/* <Nav.Link href="#">
                                 <Link to="/reservierungen" className="m-3">
                                     Reservierungen
                                 </Link>
-                            </Nav.Link>
+                            </Nav.Link> */}
                             <Nav.Link href="#">
                                 <Link to="/thekendienst" className="m-3">
-                                    Thekendienst
+                                <Button type="primary"  size='medium' shape='round'>Thekendienst</Button>
                                 </Link>
                             </Nav.Link>
                         </Nav>

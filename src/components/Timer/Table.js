@@ -8,13 +8,6 @@ import {
     faPeopleGroup,
 } from '@fortawesome/free-solid-svg-icons'
 import React, { useState } from 'react'
-import {
-    UsergroupAddOutlined,
-    CloseOutlined,
-    PercentageOutlined,
-    HourglassOutlined,
-    PoweroffOutlined,
-} from '@ant-design/icons'
 import { Avatar, Card, TimePicker } from 'antd'
 import moment from 'moment'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -106,7 +99,7 @@ function Table({
 
     const headCard = (
         <>
-            <Space>
+            <Space className='rounded'>
                 <Avatar
                     src={require(`../assets/img/${table.tableNumber}ball.png`)}
                 />
@@ -131,6 +124,7 @@ function Table({
         <Card
             type="inner"
             title={headCard}
+            className='p-1 rounded'
             style={{
                 minWidth: 300,
                 maxWidth: 325,
@@ -156,25 +150,14 @@ function Table({
                     onConfirm={() => addHoldTable(table.tableNumber)}
                 >
                     <FontAwesomeIcon icon={faToggleOff} />
-                    {/* <PoweroffOutlined
-                        key="close"
-                        style={{ color: 'dark orange' }}
-                    />{' '} */}
                 </Popconfirm>,
                 <FontAwesomeIcon
                     icon={faPeopleGroup}
                     onClick={table.toPay && showTotalModal}
                     style={{
                         fontSize: '20px',
-                        //  flex: 1,
-                        //  alignItems: 'center'
                     }}
                 />,
-                // <div className={`fw-bold ${table.toPay && 'text-primary'}`}>
-                //     {' '}
-                //     {table.toPay}€{' '}
-                // </div>,
-
                 <Popconfirm
                     title="Are you sure delete this task?"
                     okText="Yes"
@@ -191,7 +174,6 @@ function Table({
                             {table.toPay !== 0 && table.toPay}€
                         </span>
                     )}
-                    {/* <CloseOutlined key="close" style={{ color: 'red' }} />{' '} */}
                 </Popconfirm>,
             ]}
         >
@@ -203,9 +185,6 @@ function Table({
                         icon={faHourglassHalf}
                         style={{ fontSize: '25px', color: '#666' }}
                     />
-                    // <HourglassOutlined
-                    //     style={{ fontSize: '25px', color: '#666' }}
-                    // />
                 }
                 title={<div className="text-muted"> Zeit </div>}
                 description={descCardTime}

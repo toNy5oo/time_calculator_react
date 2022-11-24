@@ -335,7 +335,7 @@ function Getranke() {
           renderItem={(item) => (
             <List.Item
               key={item.id}
-              className="bg-light p-4"
+              className="bg-light p-4 rounded"
               actions={[
                 isAdd && userSelected === item.id ? (
                   <DrinksButtons

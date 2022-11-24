@@ -26,10 +26,10 @@ const Header = ({ users, setFilteredUsers, addUser, inputElement }) => {
   return (
     <>
       <Container>
-        <Row justify="space-between">
+        <Row justify="space-between" className="bg-light rounded my-3">
           <Col className="m-4">
             <Space>
-              <div>Search a user</div>
+              {/* <div>Suchen</div> */}
               <Input
                 prefix={<SearchOutlined />}
                 className='input'
@@ -42,7 +42,7 @@ const Header = ({ users, setFilteredUsers, addUser, inputElement }) => {
           <Col className="m-4">
             <Button type='primary' icon={<PlusOutlined/>} onClick={addUser}>
               {" "}
-              Add
+              Mitglieder hinzufügen
             </Button>
           </Col>
         </Row>

@@ -18,7 +18,10 @@ const NewUserView = ({setIsAddUser, addUserToDB, setNewUser}) => {
 
   return (
     <Container>
+      <Row justify="space-between" className="bg-light rounded my-3">
+        <Col span={24}>
         <Alert
+            className='rounded'
             message={
             <>
             <Row justify='space-between'  className='align-items-center p-3'>
@@ -33,6 +36,8 @@ const NewUserView = ({setIsAddUser, addUserToDB, setNewUser}) => {
             onClose={() => setIsAddUser(false)}
         >
         </Alert>
+        </Col>
+        </Row>
     </Container>
   )
 }
