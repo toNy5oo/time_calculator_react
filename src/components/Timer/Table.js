@@ -152,27 +152,34 @@ function Table({
             }
             actions={[
                 <Popconfirm
-                    title="Der Tisch wird wieder verfügbar, die offene Zahlung findest du in offene Rechnungen"
-                    okText="Yes"
-                    cancelText="No"
-                    onConfirm={() => addHoldTable(table.tableNumber)}
-                >
-                    <FontAwesomeIcon icon={faToggleOff} />
-                </Popconfirm>,
-                <FontAwesomeIcon
-                    icon={faPeopleGroup}
-                    onClick={table.toPay && showTotalModal}
-                    style={{
-                        fontSize: '20px',
-                    }}
-                />,
+								title="Der Tisch wird wieder verfügbar, die offene Zahlung findest du in offene Rechnungen"
+								okText="Yes"
+								cancelText="No"
+								onConfirm={() => addHoldTable(table.tableNumber)}
+							>
+								<Space direction="vertical">
+									<FontAwesomeIcon icon={faToggleOff} />
+									<div>Behalten</div>
+								</Space>
+							</Popconfirm>,
+							<Space direction="vertical" onClick={table.toPay && showTotalModal}>
+								<FontAwesomeIcon
+									icon={faPeopleGroup}
+									style={{
+										fontSize: "20px",
+									}}
+								/>
+								<div>Teilen</div>
+							</Space>,
                 <Popconfirm
                     title="Are you sure delete this task?"
                     okText="Yes"
                     cancelText="No"
                     onConfirm={() => closeTable(table.tableNumber, true)}
                 >
+                    <Space direction='vertical'>
                     <FontAwesomeIcon icon={faMoneyBillWave} />
+                    <div>
                     {table.toPay !== 0 && (
                         <span
                             className={`fw-bold ${
@@ -182,6 +189,12 @@ function Table({
                             {table.toPay !== 0 && table.toPay}€
                         </span>
                     )}
+                    </div>
+                    
+                    
+                    </Space>
+                    
+                    
                 </Popconfirm>,
             ]}
         >
