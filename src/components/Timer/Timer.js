@@ -7,6 +7,7 @@ import moment from 'moment'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { SmileOutlined } from '@ant-design/icons'
 import { DEFAULT_TEMPLATE } from '../../components/assets/data/tablesArray'
+import { motion } from "framer-motion"
 
 const closeTableNotification = (num) => {
     notification.open({
@@ -288,7 +289,6 @@ function Timer() {
                 <Row
                     justify="space-around"
                     align="center"
-                    ref={parent}
                     className="mx-5 mt-3"
                 >
                     {tables.map(

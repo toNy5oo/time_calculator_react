@@ -4,13 +4,15 @@ import { Container } from "react-bootstrap";
 import {
   PlusOutlined, SearchOutlined
 } from "@ant-design/icons";
+import NewUserView from "./NewUserView";
 
-const Header = ({ users, setFilteredUsers, addUser, inputElement }) => {
+const Header = ({ users, setFilteredUsers, addUser, inputElement, setIsAddUser, isAddUser, addUserToDB, setNewUser, inputRef }) => {
   const { Search } = AutoComplete;
   const [searchText, setSearchText] = useState("");
  
-
+  //To focus straight away once clicked on Add User
   useEffect(() => {
+    console.log(inputRef)
     return () => {};
   }, [searchText]);
 
@@ -25,6 +27,18 @@ const Header = ({ users, setFilteredUsers, addUser, inputElement }) => {
 
   return (
     <>
+        {isAddUser ? (
+        <NewUserView
+          users={users}
+          setFilteredUsers={setFilteredUsers}
+          addUser={addUser}
+          inputElement={inputElement}
+          setIsAddUser={setIsAddUser}
+          addUserToDB={addUserToDB}
+          setNewUser={setNewUser}
+          inputRef={inputRef}
+        />)
+        : 
       <Container>
         <Row justify="space-between" className="bg-light rounded my-3">
           <Col className="m-4">
@@ -47,6 +61,7 @@ const Header = ({ users, setFilteredUsers, addUser, inputElement }) => {
           </Col>
         </Row>
       </Container>
+      }
     </>
   );
 };

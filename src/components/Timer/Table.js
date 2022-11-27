@@ -11,6 +11,7 @@ import React, { useState } from 'react'
 import { Avatar, Card, TimePicker } from 'antd'
 import moment from 'moment'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { AnimatePresence, motion } from "framer-motion"
 
 const { Meta } = Card
 const format = 'HH:mm'
@@ -121,6 +122,13 @@ function Table({
     }
 
     return (
+        <>
+        <AnimatePresence>
+        <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: -0.5 }}
+        transition={{ ease: "easeOut", duration: 0.5 }}>
         <Card
             type="inner"
             title={headCard}
@@ -227,6 +235,9 @@ function Table({
                 </div>{' '}
             </Modal>{' '}
         </Card>
+        </motion.div>
+        </AnimatePresence>
+        </>
     )
 }
 

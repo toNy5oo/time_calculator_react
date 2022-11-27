@@ -47,6 +47,7 @@ import Header from "./Header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import NewUserView from "./NewUserView";
 
+
 function Getranke() {
   //Notification
   const showNotification = (title, msg) => {
@@ -68,7 +69,9 @@ function Getranke() {
   const [isAddUser, setIsAddUser] = useState(false);
   const [newUser, setNewUser] = useState("");
   const parent = useRef(null)
-  let inputElement = useRef("");
+  let inputElement = useRef(null);
+  let inputRef = useRef(null);
+
 
   useEffect(() => {
     fetchDBDrinksData();
@@ -217,6 +220,7 @@ function Getranke() {
   };
 
   const addUser = () => {
+    // document.getElementById("mitglieder__name").focus()
     setIsAddUser(true);
   };
 
@@ -283,20 +287,17 @@ function Getranke() {
 
   return (
     <>
-      {!isAddUser ? (
-        <Header
+     <Header
           users={users}
           setFilteredUsers={setFilteredUsers}
           addUser={addUser}
           inputElement={inputElement}
-        />
-      ) : (
-        <NewUserView
           setIsAddUser={setIsAddUser}
           addUserToDB={addUserToDB}
           setNewUser={setNewUser}
-        />
-      )}
+          isAddUser={isAddUser}
+          inputRef={inputRef}
+     />
       {addToUser.length !== 0 && (
         <Container fluid>
           <Row>
