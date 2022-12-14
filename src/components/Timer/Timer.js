@@ -7,7 +7,6 @@ import moment from "moment";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { SmileOutlined } from "@ant-design/icons";
 import { DEFAULT_TEMPLATE } from "../../components/assets/data/tablesArray";
-import { motion } from "framer-motion";
 import * as price from "../assets/data/const";
 
 const closeTableNotification = (num) => {
