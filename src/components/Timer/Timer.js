@@ -3,11 +3,16 @@ import TimerHeader from "./TimerHeader";
 import Table from "./Table";
 import React, { useState, useEffect } from "react";
 import { notification } from "antd";
-import moment from "moment";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { SmileOutlined } from "@ant-design/icons";
 import { DEFAULT_TEMPLATE } from "../../components/assets/data/tablesArray";
 import * as price from "../assets/data/const";
+import moment from "moment";
+import {
+	calculateInitalTime,
+	isNotZero,
+	timePlayed,
+} from "../../utils/timeHelper";
 
 const closeTableNotification = (num) => {
 	notification.open({
@@ -76,11 +81,13 @@ function Timer() {
 			holdTables.filter((t) => t.tableNumber === parseInt(tableNumber))
 				.length === 0
 		) {
-			const obj = tables.filter((t) => t.tableNumber === parseInt(tableNumber));
+			const [obj] = tables.filter(
+				(t) => t.tableNumber === parseInt(tableNumber)
+			);
 
-			if (obj[0].start !== 0 && obj[0].end !== 0) {
-				obj[0].start = moment(obj[0].start).format("HH:mm");
-				obj[0].end = moment(obj[0].end).format("HH:mm");
+			if (obj.start !== 0 && obj.end !== 0) {
+				obj.start = moment(obj.start).format("HH:mm");
+				obj.end = moment(obj.end).format("HH:mm");
 				setHoldTables((state) => [...state, ...obj]);
 				closeTable(tableNumber);
 			} else {
@@ -100,13 +107,15 @@ function Timer() {
 			);
 	};
 
+	// ! -------------------------------------- OPEN TABLE
+
 	//Add table from view
 	const openTable = (tableNumber) => {
 		setTables((state) => {
 			const list = state.map((item) => {
 				// 👇️ Get the right table obj
 				if (item.tableNumber === parseInt(tableNumber)) {
-					return { ...item, isActive: true };
+					return { ...item, isActive: true, start: calculateInitalTime() };
 				}
 				return item;
 			});
@@ -114,10 +123,10 @@ function Timer() {
 		});
 	};
 
+	// ! -------------------------------------- CLOSE TABLE
+
 	//Remove table from view
 	const closeTable = (tableNumber, showMessage) => {
-		// setShow(true)
-		showMessage && closeTableNotification(tableNumber);
 
 		// 👇️ Get the right table obj
 		setTables((state) => {
@@ -135,88 +144,65 @@ function Timer() {
 				}
 				return item;
 			});
+			showMessage && closeTableNotification(tableNumber);
 			return list;
 		});
 	};
 
+	// ! -------------------------------------- START TIME
+
 	//Update table on start time and minPlayed
-	const startTime = (time, index) => {
+	const startTime = (time, tableSelected) => {
 		setTables((prevState) => {
 			const newState = prevState.map((obj) => {
-				// 👇️ if id equals 2, update country property
 				let pay = 0;
 				let played = 0;
-				if (obj.tableNumber === index) {
-					if (time !== 0 && obj.end !== 0) {
+				if (obj.tableNumber === tableSelected) {
+					if (isNotZero(time) && isNotZero(obj.end)) {
 						played = timePlayed(time, obj.end);
-						pay = toPay(played[1], obj.discount);
+						pay = toPay(played, obj.discount);
 					}
 					return {
 						...obj,
 						start: time,
-						played: played[0],
+						played: played,
 						toPay: pay,
-					}; //played: min, toPay: pay
+					}; 
 				}
-				// 👇️ otherwise return object as is
 				return obj;
 			});
 			return newState;
 		});
 	};
+
+	// ! -------------------------------------- END TIME
+
+	const setEndTime = (tableNumber) => {
+		const lastTimeSlot = moment();
+		lastTimeSlot.hour(23).minute(59)
+		endTime(lastTimeSlot, tableNumber)
+	}
 
 	//Update table on end time and minPlayed
-	const endTime = (time, index) => {
+	const endTime = (time, tableSelected) => {
 		setTables((prevState) => {
 			const newState = prevState.map((obj) => {
-				// 👇️ if id equals 2, update country property
 				let pay = 0;
 				let played = 0;
-				if (obj.tableNumber === index) {
-					if (time !== 0 && obj.start !== 0) {
+				if (obj.tableNumber === tableSelected) {
+					if (isNotZero(time) && isNotZero(obj.start)) {
 						played = timePlayed(obj.start, time);
-						pay = toPay(played[1], obj.discount);
+						pay = toPay(played, obj.discount);
 					}
-					return { ...obj, end: time, played: played[0], toPay: pay }; //played: min, toPay: pay
+					return { ...obj, end: time, played: played, toPay: pay };
 				}
-				// 👇️ otherwise return object as is
 				return obj;
 			});
 			return newState;
 		});
 	};
 
-	/**
-	 * Calculate difference between ending time and starting time using parseTime function
-	 * @param {moment time} start
-	 * @param {moment time} end
-	 * @returns array[string: time, number: time]
-	 */
-	const timePlayed = (start, end) => {
-		if (end !== 0) {
-			const duration = Math.ceil(
-				moment.duration(end.diff(start, "seconds") / 60)
-			);
-			return [parseTime(duration), duration];
-		} else return 0;
-	};
-
-	/**
-	 * Round to lowest number both hours and minutes and set them to 2 digits each
-	 * @param {number} minutesPlayed
-	 * @returns
-	 */
-	function parseTime(minutesPlayed) {
-		let hours = Math.floor(minutesPlayed / 60).toLocaleString("en-US", {
-			minimumIntegerDigits: 2,
-			useGrouping: false,
-		});
-		let minutes = Math.floor(minutesPlayed % 60).toLocaleString("en-US", {
-			minimumIntegerDigits: 2,
-			useGrouping: false,
-		});
-		return `${hours}h : ${minutes}m`;
-	}
+	// ! -------------------------------------- AMOUNT TO PAY
 
 	/**
 	 * Calculate how much is to pay considered the time and if discount applies
@@ -226,15 +212,18 @@ function Timer() {
 	 */
 	const toPay = (timePlayed, discount) => {
 		return parseFloat(
-			discount ? timePlayed * (price.HALF_PRICE/60) : timePlayed * (price.FULL_PRICE/60)
+			discount
+				? parseInt(timePlayed) * price.HALF_PRICE_MIN
+				: parseInt(timePlayed) * price.FULL_PRICE_MIN
 		).toFixed(2);
 	};
+
+	// ! -------------------------------------- TOGGLE DISCOUNT
 
 	//Toggle discounts and recalculate amount to pay
 	const toggleDiscount = (index) => {
 		setTables((prevState) => {
 			const newState = prevState.map((obj) => {
-				// 👇️ if id equals 2, update country property
 				let pay = 0;
 				if (obj.tableNumber === index) {
 					if (obj.toPay !== 0) {
@@ -243,12 +232,13 @@ function Timer() {
 					}
 					return { ...obj, discount: !obj.discount, toPay: pay };
 				}
-				// 👇️ otherwise return object as is
 				return obj;
 			});
 			return newState;
 		});
 	};
+
+	// ! -------------------------------------- RESET ALL TABLES
 
 	//Gets every table and closes it
 	const resetAllTables = () => {
@@ -276,7 +266,7 @@ function Timer() {
 			/>
 			{isEmpty ? (
 				<Row justify="center" align="middle">
-					<Col className="text-center p-5 fs-5"> No active tables </Col>{" "}
+					<Col className="p-5 text-center fs-5"> No active tables </Col>{" "}
 				</Row>
 			) : (
 				<Row justify="space-around" align="center" className="mx-5 mt-3">
@@ -287,7 +277,7 @@ function Timer() {
 									xs={24}
 									sm={12}
 									xl={6}
-									className="d-flex justify-content-around my-3 p-1"
+									className="p-1 my-3 d-flex justify-content-around"
 								>
 									<Table
 										table={table}
@@ -297,6 +287,7 @@ function Timer() {
 										endTime={endTime}
 										toggleDiscount={toggleDiscount}
 										addHoldTable={addHoldTable}
+										setEndTime={setEndTime}
 									/>{" "}
 								</Col>
 							)

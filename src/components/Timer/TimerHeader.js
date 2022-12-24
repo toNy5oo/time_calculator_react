@@ -12,7 +12,6 @@ import {
 	Popconfirm,
 	Avatar,
 	Col,
-	Typography,
 	Badge,
 	Input,
 } from "antd";
@@ -38,7 +37,8 @@ function TimerHeader({
 		setOpen(true);
 	};
 	const onClose = () => {
-		setOpen(false, setHoldTableClicked(0));
+		setOpen(false);
+		setHoldTableClicked(0)
 	};
 
 	function handleChangeInput(val) {

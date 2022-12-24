@@ -43,11 +43,6 @@ function BootNavbar() {
                                     Reservierungen
                                 </Link>
                             </Nav.Link> */}
-                            <Nav.Link href="#">
-                                <Link to="/thekendienst" className="m-3">
-                                <Button type="primary"  size='medium' shape='round'>Thekendienst</Button>
-                                </Link>
-                            </Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
                     <Navbar.Collapse className="justify-content-end">

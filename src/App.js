@@ -6,7 +6,6 @@ import { Content } from 'antd/lib/layout/layout'
 import './App.css'
 import Getranke from './components/Getranke/Getranke'
 import Timer from './components/Timer/Timer'
-import Thekendienst from './components/Calendar/Thekendienst'
 import Reservierungen from './components/Reservierungen'
 import BootNavbar from './components/BootNavbar'
 
@@ -24,10 +23,6 @@ function App() {
                             <Route
                                 path="/reservierungen"
                                 element={<Reservierungen />}
-                            />{' '}
-                            <Route
-                                path="/thekendienst"
-                                element={<Thekendienst />}
                             />{' '}
                         </Routes>{' '}
                     </Content>{' '}
