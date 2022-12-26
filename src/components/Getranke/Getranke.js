@@ -5,7 +5,6 @@ import autoAnimate from "@formkit/auto-animate";
 import {
 	Alert,
 	Button,
-	Col,
 	List,
 	Popconfirm,
 	Row,
@@ -43,7 +42,7 @@ function Getranke() {
 		});
 	};
 
-	let db = new Localbase("db");
+	let db = new Localbase("pooltime_DRINKS");
 	//Comment to remove logger
 	db.config.debug = false;
 	const [filteredUsers, setFilteredUsers] = useState([]);

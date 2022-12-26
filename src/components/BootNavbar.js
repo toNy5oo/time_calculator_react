@@ -1,5 +1,4 @@
 import { Image } from 'react-bootstrap'
-
 import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
@@ -35,11 +34,11 @@ function BootNavbar() {
                                 </Link>
                                 
                             </Nav.Link>
-                            {/* <Nav.Link href="#">
+                            <Nav.Link href="#">
                                 <Link to="/reservierungen" className="m-3">
                                     Reservierungen
                                 </Link>
-                            </Nav.Link> */}
+                            </Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
                     <Navbar.Collapse className="justify-content-end">
