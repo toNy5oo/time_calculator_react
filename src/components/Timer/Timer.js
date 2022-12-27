@@ -127,7 +127,6 @@ function Timer() {
 
 	//Remove table from view
 	const closeTable = (tableNumber, showMessage) => {
-
 		// 👇️ Get the right table obj
 		setTables((state) => {
 			const list = state.map((item) => {
@@ -167,7 +166,7 @@ function Timer() {
 						start: time,
 						played: played,
 						toPay: pay,
-					}; 
+					};
 				}
 				return obj;
 			});
@@ -179,9 +178,9 @@ function Timer() {
 
 	const setEndTime = (tableNumber) => {
 		const lastTimeSlot = moment();
-		lastTimeSlot.hour(23).minute(59)
-		endTime(lastTimeSlot, tableNumber)
-	}
+		lastTimeSlot.hour(23).minute(59);
+		endTime(lastTimeSlot, tableNumber);
+	};
 
 	//Update table on end time and minPlayed
 	const endTime = (time, tableSelected) => {
@@ -274,6 +273,7 @@ function Timer() {
 						(table) =>
 							table.isActive && (
 								<Col
+									key={table.tableNumber + Math.random()}
 									xs={24}
 									sm={12}
 									xl={6}

@@ -212,13 +212,13 @@ function Getranke() {
 			showNotification(
 				"Getränke hinzufügen",
 				"Getränke sind an der mitglieder " +
-					findUserName(userSelected, users) + " hinzufügen"
+					findUserName(userSelected, users) +
+					" hinzufügen"
 			);
 		} else {
 			showNotification(
 				"Fehler",
-				"Es gibt keine getränke ausgewählt " +
-					findUserName(userSelected, users)
+				"Es gibt keine getränke ausgewählt " + findUserName(userSelected, users)
 			);
 		}
 	}
@@ -381,7 +381,7 @@ function Getranke() {
 								active
 							>
 								<List.Item.Meta
-									key={userRecord.id}
+									key={userRecord.id + userRecord.title}
 									ref={parent}
 									avatar={
 										<UserOutlined
