@@ -3,11 +3,10 @@ import TimerHeader from "./TimerHeader";
 import Table from "./Table";
 import React, { useState, useEffect } from "react";
 import { notification } from "antd";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { SmileOutlined } from "@ant-design/icons";
 import { DEFAULT_TEMPLATE } from "../../components/assets/data/tablesArray";
 import * as price from "../assets/data/const";
-import moment from "moment";
+import dayjs from "dayjs";
 import {
 	calculateInitalTime,
 	isNotZero,
@@ -30,7 +29,6 @@ const holdTableNotification = (num, message, desc) => {
 };
 
 function Timer() {
-	const [parent] = useAutoAnimate(/* optional config */);
 	const [tables, setTables] = React.useState(
 		localStorage.getItem("tables")
 			? JSON.parse(localStorage.getItem("tables"))
@@ -49,7 +47,7 @@ function Timer() {
 	useEffect(() => {
 		tables.map((table) => table.isActive && setIsEmpty(false));
 		setActiveTables(countActiveTables().length);
-		console.log(tables);
+		// console.log(tables);
 	}, [tables, holdTables]);
 
 	useEffect(() => {
@@ -74,21 +72,12 @@ function Timer() {
 
 	//Deactivate the table but keeps the info
 	const addHoldTable = (tableNumber) => {
-		console.log(
-			holdTables.filter((t) => t.tableNumber === parseInt(tableNumber)).length
-		);
-		if (
-			holdTables.filter((t) => t.tableNumber === parseInt(tableNumber))
-				.length === 0
-		) {
-			const [obj] = tables.filter(
-				(t) => t.tableNumber === parseInt(tableNumber)
-			);
-
+		if (holdTables.filter((t) => t.tableNumber === tableNumber).length === 0) {
+			const [obj] = tables.filter((t) => t.tableNumber === tableNumber);
 			if (obj.start !== 0 && obj.end !== 0) {
-				obj.start = moment(obj.start).format("HH:mm");
-				obj.end = moment(obj.end).format("HH:mm");
-				setHoldTables((state) => [...state, ...obj]);
+				obj.start = dayjs(obj.start).format("HH:mm");
+				obj.end = dayjs(obj.end).format("HH:mm");
+				setHoldTables((state) => [...state, obj]);
 				closeTable(tableNumber);
 			} else {
 				holdTableNotification(
@@ -177,8 +166,7 @@ function Timer() {
 	// ! -------------------------------------- END TIME
 
 	const setEndTime = (tableNumber) => {
-		const lastTimeSlot = moment();
-		lastTimeSlot.hour(23).minute(59);
+		const lastTimeSlot = dayjs().hour(23).minute(59);
 		endTime(lastTimeSlot, tableNumber);
 	};
 

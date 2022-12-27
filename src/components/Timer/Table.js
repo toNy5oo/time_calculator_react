@@ -24,7 +24,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { isNotZero, parseTime } from "../../utils/timeHelper";
 import { LoadingOutlined } from "@ant-design/icons";
 
-
 const { Meta } = Card;
 const format = "HH:mm";
 
@@ -58,7 +57,7 @@ function Table({
 	endTime,
 	toggleDiscount,
 	addHoldTable,
-	setEndTime
+	setEndTime,
 }) {
 	const [sharedBill, setSharedBill] = useState("2");
 
@@ -106,7 +105,11 @@ function Table({
 					disabled={isNotZero(table.start) ? false : true}
 					value={table.end !== 0 ? moment(table.end) : ""}
 					renderExtraFooter={() => (
-						<Button size="small" type="primary" onClick={() => setEndTime(table.tableNumber)}>
+						<Button
+							size="small"
+							type="primary"
+							onClick={() => setEndTime(table.tableNumber)}
+						>
 							End at 24:00
 						</Button>
 					)}
@@ -120,6 +123,7 @@ function Table({
 			<Space direction="vertical">
 				<Space align="center">
 					<Switch
+						checked={table.discount}
 						checkedChildren="Ja"
 						unCheckedChildren="Nein"
 						onChange={() => toggleDiscount(table.tableNumber)}
