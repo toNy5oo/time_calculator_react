@@ -80,10 +80,6 @@ function Getranke() {
 		fetchDBUsersData();
 	}, []);
 
-	useEffect(() => {
-		parent.current && autoAnimate(parent.current);
-	}, [parent]);
-
 	/** Fetch the users from the DB sorted by amount to pay in descending order */
 	async function fetchDBUsersData() {
 		try {
@@ -347,7 +343,7 @@ function Getranke() {
 				inputRef={inputRef}
 			/>
 			{/* List */}
-			<Container ref={parent}>
+			<Container>
 				<List
 					className="demo-loadmore-list"
 					itemLayout="horizontal"

@@ -12,7 +12,6 @@ const Header = ({ users, setFilteredUsers, addUser, inputElement, setIsAddUser, 
  
   //To focus straight away once clicked on Add User
   useEffect(() => {
-    console.log(inputRef)
     return () => {};
   }, [searchText]);
 

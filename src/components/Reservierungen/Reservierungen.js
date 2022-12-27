@@ -10,16 +10,18 @@ import {
 	Space,
 	Row,
 	Col,
+	Divider,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import moment from "moment";
 import Localbase from "localbase";
 import { Container } from "react-bootstrap";
-import Booking from "./Booking";
+import Booking from "./BookingDate";
 
 function Reservierungen() {
-	const [newReservation, setNewReservation] = useState({});
 	const [bookings, setBookings] = useState([]);
+	const [uniqueDates, setUniqueDates] = useState([]);
+
 	const [open, setOpen] = useState(false);
 	const showDrawer = () => {
 		setOpen(true);
@@ -44,7 +46,27 @@ function Reservierungen() {
 				.collection(collName)
 				.orderBy("date", "asc")
 				.get();
+
+			//Get unique list of dates
+			const dateSet = new Set();
 			bookingsDB && setBookings(bookingsDB);
+			for (const booking of bookingsDB) {
+				dateSet.add(booking.date);
+			}
+
+			//Create array from SET
+			setUniqueDates(Array.from(dateSet));
+
+			/** Creates a subarray for each single date and add that to OrderedArray */
+			const orderedBookings = [];
+			for (const date of uniqueDates) {
+				const singleDateBookings = bookingsDB.filter(
+					(booking) => booking.date === date
+				);
+				orderedBookings.push(singleDateBookings);
+			}
+
+			setBookings(orderedBookings);
 		} catch (error) {
 			console.log("error: ", error);
 		}
@@ -64,11 +86,14 @@ function Reservierungen() {
 		fetchDBBookingsData();
 	}
 
+	/** Booking Schema */
 	const createReservation = (form) => ({
+		id: Math.floor(Math.random() * Date.now()),
 		name: form.name,
-		date: form.date.format("DD/MM/YYYY HH:mm"),
+		date: form.date.format("DD/MM/YYYY"),
+		time: form.date.format("HH:mm"),
 		phone: form.phone ? form.phone : "Keine handynummer",
-		tisch: form.table ? form.table : "Keine Tisch gegeben",
+		table: form.table ? form.table : "Keine Tisch gegeben",
 		extra: form.extra ? form.extra : "Keine extra info",
 	});
 
@@ -95,6 +120,13 @@ function Reservierungen() {
 		return current && current < moment().endOf("day");
 	};
 
+	const editBooking = (recordID) => {
+		console.log(recordID);
+	};
+	const deleteBooking = (recordID) => {
+		console.log(recordID);
+	};
+
 	return (
 		<>
 			<Container>
@@ -115,13 +147,19 @@ function Reservierungen() {
 				</Row>
 			</Container>
 
-			{!bookings ? (
-				<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-			) : (
-				bookings?.map((r, i) =>
-					i === 0 ? <Booking booking={r} /> : <Booking booking={r} />
-				)
-			)}
+
+			{
+			bookings?.length > 0
+			?
+			(
+			bookings.map((singleDateArray, index) => (
+				<Booking bookings={singleDateArray} date={uniqueDates[index]} editBooking={editBooking} deleteBooking={deleteBooking} />
+			))
+			)
+			:
+			(<Empty />)
+			
+			}
 
 			<Drawer
 				title="Neue Reservierungen"
