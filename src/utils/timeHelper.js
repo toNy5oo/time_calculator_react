@@ -7,9 +7,13 @@ import dayjs from "dayjs";
 export const calculateInitalTime = () => {
 	const now = dayjs();
 	const minutes = dayjs().minute();
+	console.log("Minutes =>", minutes);
 	const multiplier = parseInt(minutes / 5);
+	console.log("Multiplier =>", multiplier);
 	now.minute(5 * multiplier);
-	return now;
+	console.log(dayjs(now, "HH:mm"));
+	return dayjs(now, "HH:mm");
+	// return now.format("DD/MM/YYYY HH:mm");
 };
 
 /** Calculate time played in seconds and rounds up the number divided by 60 */

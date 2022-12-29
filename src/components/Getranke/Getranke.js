@@ -448,7 +448,8 @@ function Getranke() {
 				></Alert>
 				<Row justify={"space-between"} align={"middle"} className="my-3">
 					<Space>
-						<SearchOutlined className="mx-1 text-secondary" />
+						<SearchOutlined className="text-secondary" />
+						<span className="mx-1 text-secondary">Getränke Suchen</span>
 						<AutoComplete
 							allowClear
 							autoFocus
@@ -472,14 +473,15 @@ function Getranke() {
 						{drinks.map((d) => {
 							if (d.uid === userSelected) {
 								return (
-									<Tag
-										closable
-										closeIcon={<PlusOutlined />}
-										onClose={(e) => addDrinkToTemporaryList(e, d.key)}
-										color="blue"
-									>
-										{d.label}
-									</Tag>
+									<Button type="link" className="m-0 p-0">
+										<Tag
+											onClick={(e) => addDrinkToTemporaryList(e, d.key)}
+											color="blue"
+										>
+											<PlusOutlined />
+											<span>{d.label}</span>
+										</Tag>
+									</Button>
 								);
 							}
 						})}

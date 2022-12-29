@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import {
-	QuestionCircleOutlined,
-	PlusCircleFilled,
-} from "@ant-design/icons";
+import { QuestionCircleOutlined, PlusCircleFilled } from "@ant-design/icons";
 import {
 	Row,
 	Dropdown,
@@ -38,7 +35,7 @@ function TimerHeader({
 	};
 	const onClose = () => {
 		setOpen(false);
-		setHoldTableClicked(0)
+		setHoldTableClicked(0);
 	};
 
 	function handleChangeInput(val) {
@@ -82,14 +79,15 @@ function TimerHeader({
 			<Container>
 				<Row justify="space-between" className="bg-light rounded my-3">
 					<Col className="m-4">
-					<Space>
-					<div>Besetzte Tische:</div><strong>{activeTables}</strong>
-              <Input
-                className='invisible'
-                allowClear={true}
-                placeholder="Mitglieder suchen"
-              ></Input>
-            </Space>
+						<Space>
+							<span className="fs-6 text-muted mx-2">Besetzte Tische:</span>
+							<strong>{activeTables}</strong>
+							<Input
+								className="invisible"
+								allowClear={true}
+								placeholder="Mitglieder suchen"
+							></Input>
+						</Space>
 					</Col>
 					<Col className="m-4">
 						<Space>
@@ -126,18 +124,18 @@ function TimerHeader({
 				</Row>
 			</Container>
 
-			<DrawerTablesOnHold 
-                onClose={onClose}
-                open={open}
-                holdTables={holdTables}
-                showSharedBill={showSharedBill}
-                setHoldTableClicked={setHoldTableClicked}
-                holdTableClicked={holdTableClicked}
-                handleChangeInput={handleChangeInput}
-                sharedBill={sharedBill}
-                setShowSharedBill={setShowSharedBill}
-                closeHoldTable={closeHoldTable}
-            />
+			<DrawerTablesOnHold
+				onClose={onClose}
+				open={open}
+				holdTables={holdTables}
+				showSharedBill={showSharedBill}
+				setHoldTableClicked={setHoldTableClicked}
+				holdTableClicked={holdTableClicked}
+				handleChangeInput={handleChangeInput}
+				sharedBill={sharedBill}
+				setShowSharedBill={setShowSharedBill}
+				closeHoldTable={closeHoldTable}
+			/>
 		</>
 	);
 }

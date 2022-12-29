@@ -104,7 +104,11 @@ function Timer() {
 			const list = state.map((item) => {
 				// 👇️ Get the right table obj
 				if (item.tableNumber === parseInt(tableNumber)) {
-					return { ...item, isActive: true, start: calculateInitalTime() };
+					return {
+						...item,
+						isActive: true,
+						// start: calculateInitalTime()
+					};
 				}
 				return item;
 			});
