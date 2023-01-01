@@ -24,6 +24,23 @@ import {
 	parseDate,
 	showSelectedDays,
 } from "../../utils/bookingHelper";
+import {
+	ADD_ERR,
+	ADD_ERR_DESC,
+	ADD_ERR_TITLE,
+	ADD_SUCC,
+	ADD_SUCC_DESC,
+	ADD_SUCC_TITLE,
+	DEL_SUCC,
+	DEL_SUCC_DESC,
+	DEL_SUCC_TITLE,
+	EDIT_ERR,
+	EDIT_ERR_DESC,
+	EDIT_ERR_TITLE,
+	EDIT_SUCC,
+	EDIT_SUCC_DESC,
+	EDIT_SUCC_TITLE,
+} from "./string";
 
 function Reservierungen() {
 	const [bookings, setBookings] = useState([]);
@@ -33,6 +50,7 @@ function Reservierungen() {
 		moment().add(3, "days").format("DD/MM/YYYY")
 	);
 
+	const EMPTY_STRING = "";
 	const [open, setOpen] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -56,8 +74,15 @@ function Reservierungen() {
 				.orderBy("date", "asc")
 				.get();
 
+			/** Filter records starting from today */
+			const bookingsFromToday = databaseResponse.filter((e) =>
+				moment(e.date, "DD/MM/YYYY").isAfter(
+					moment(moment().subtract(1, "day"), "DD/MM/YYYY")
+				)
+			);
+
 			/** Filter records by SelectedInterval of amount of reservations to show */
-			const filtered = databaseResponse.filter((e) =>
+			const filtered = bookingsFromToday.filter((e) =>
 				moment(e.date, "DD/MM/YYYY").isBefore(moment(interval, "DD/MM/YYYY"))
 			);
 
@@ -78,7 +103,6 @@ function Reservierungen() {
 					)
 				)
 			);
-
 			getOrderedBookings(databaseResponse, dateSet);
 		} catch (error) {
 			console.log("error: ", error);
@@ -104,20 +128,11 @@ function Reservierungen() {
 		//Create a new record
 		try {
 			await db.collection(collName).add(booking);
-			showNotification(
-				"success",
-				"Booking confirmed",
-				"The booking has been registered correctly"
-			);
+			showNotification(ADD_SUCC, ADD_SUCC_TITLE, ADD_SUCC_DESC);
 		} catch (error) {
-			showNotification(
-				"error",
-				"There was a problem",
-				"The booking has not been registered."
-			);
+			showNotification(ADD_ERR, ADD_ERR_TITLE, ADD_ERR_DESC);
 			console.log("There was an error, do something else.");
 		}
-
 		fetchDBBookingsData();
 		onClose();
 	}
@@ -129,20 +144,11 @@ function Reservierungen() {
 		//Create a new record
 		try {
 			await db.collection(collName).doc({ id: booking.id }).update(booking);
-			showNotification(
-				"info",
-				"Booking updated",
-				"The booking has been updated correctly"
-			);
+			showNotification(EDIT_SUCC, EDIT_SUCC_TITLE, EDIT_SUCC_DESC);
 		} catch (error) {
-			showNotification(
-				"error",
-				"There was a problem",
-				"The booking has not been registered."
-			);
+			showNotification(EDIT_ERR, EDIT_ERR_TITLE, EDIT_ERR_DESC);
 			console.log("There was an error, do something else.");
 		}
-
 		fetchDBBookingsData();
 		onClose();
 	}
@@ -155,9 +161,9 @@ function Reservierungen() {
 		name: form.name,
 		date: form.date.format("DD/MM/YYYY"),
 		time: form.date.format("HH:mm"),
-		phone: form.phone ? form.phone : "",
-		table: form.table ? form.table : "",
-		extra: form.extra ? form.extra : "",
+		phone: form.phone ? form.phone : EMPTY_STRING,
+		table: form.table ? form.table : EMPTY_STRING,
+		extra: form.extra ? form.extra : EMPTY_STRING,
 	});
 
 	/** Booking Schema */
@@ -166,9 +172,9 @@ function Reservierungen() {
 		name: form.name,
 		date: form.date.format("DD/MM/YYYY"),
 		time: form.date.format("HH:mm"),
-		phone: form.phone ? form.phone : "",
-		table: form.table ? form.table : "",
-		extra: form.extra ? form.extra : "",
+		phone: form.phone ? form.phone : EMPTY_STRING,
+		table: form.table ? form.table : EMPTY_STRING,
+		extra: form.extra ? form.extra : EMPTY_STRING,
 	});
 
 	const showNotification = (type, title, desc) => {
@@ -220,11 +226,6 @@ function Reservierungen() {
 
 	//!TODO Implement action functions
 	const editBooking = (form) => {
-		console.log(
-			"%cReservierungen.js line:179 In edit ",
-			"color: #007acc;",
-			form
-		);
 		const reservation = updateReservation(form);
 		console.log(reservation);
 		editReservationsToDatabase(reservation);
@@ -236,11 +237,7 @@ function Reservierungen() {
 			const response = await db.collection(collName).doc({ id: id }).delete();
 			//If the response is successful then remove the drinks from this user from the list
 			response.success && fetchDBBookingsData();
-			showNotification(
-				"success",
-				"Booking deleted",
-				"The reservation has been deleted"
-			);
+			showNotification(DEL_SUCC, DEL_SUCC_TITLE, DEL_SUCC_DESC);
 		} catch (error) {
 			console.log("Error: ", error);
 		}
@@ -279,6 +276,7 @@ function Reservierungen() {
 					</Col>
 				</Row>
 			</Container>
+
 			{bookings?.length > 0 ? (
 				bookings?.map((singleDateArray, index) => (
 					<Booking
@@ -388,7 +386,6 @@ function Reservierungen() {
 			<Modal
 				title="Reservierung Bearbeiten"
 				open={isModalOpen}
-				// onOk={editBooking}
 				onCancel={cancelEdit}
 				destroyOnClose={true}
 				footer={null}

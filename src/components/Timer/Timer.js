@@ -1,18 +1,18 @@
 import { Col, Row } from "antd";
 import TimerHeader from "./TimerHeader";
 import Table from "./Table";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { notification } from "antd";
 import { SmileOutlined } from "@ant-design/icons";
 import { DEFAULT_TEMPLATE } from "../../components/assets/data/tablesArray";
 import * as price from "../assets/data/const";
 import dayjs from "dayjs";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
 	calculateInitalTime,
 	isNotZero,
 	timePlayed,
 } from "../../utils/timeHelper";
+import autoAnimate from "@formkit/auto-animate";
 
 const closeTableNotification = (num) => {
 	notification.open({
@@ -30,7 +30,8 @@ const holdTableNotification = (num, message, desc) => {
 };
 
 function Timer() {
-	const [parent, enableAnimations] = useAutoAnimate(/* optional config */);
+	const parent = useRef(null);
+
 	const [tables, setTables] = React.useState(
 		localStorage.getItem("tables")
 			? JSON.parse(localStorage.getItem("tables"))
@@ -55,6 +56,10 @@ function Timer() {
 		localStorage.setItem("tables", JSON.stringify(tables));
 		localStorage.setItem("holdtables", JSON.stringify(holdTables));
 	}, [tables, holdTables]);
+
+	useEffect(() => {
+		parent.current && autoAnimate(parent.current);
+	}, [parent]);
 
 	/**
 	 * Retrieving JSON string from localStorage to restore the state
@@ -265,7 +270,7 @@ function Timer() {
 					justify="space-around"
 					align="center"
 					className="mx-5 mt-3"
-					
+					ref={parent}
 				>
 					{tables.map(
 						(table) =>
@@ -276,11 +281,10 @@ function Timer() {
 									sm={12}
 									xl={6}
 									className="p-1 my-3 d-flex justify-content-around"
-									ref={parent}
 								>
 									<Table
 										table={table}
-										key={table.tableNumber+Math.random()}
+										key={table.tableNumber + Math.random()}
 										closeTable={closeTable}
 										startTime={startTime}
 										endTime={endTime}

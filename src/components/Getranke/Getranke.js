@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Localbase from "localbase";
 import "../assets/css/buttons.css";
-import autoAnimate from "@formkit/auto-animate";
 import {
 	Button,
 	List,
@@ -29,13 +28,11 @@ import {
 	userHasActiveDrinks,
 } from "../../utils/drinksHelper";
 import { AddCircleRounded, MoneyBillWave, RemoveCircleRounded } from "./Icons";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { motion } from "framer-motion";
 
 const options = drinklist.map((d) => ({ value: d.label, id: d.key }));
 
 function Getranke() {
-	const [parentAnimation, enableAnimations] =
-		useAutoAnimate(/* optional config */);
 	//Notification
 	const showNotification = (type, title, msg) => {
 		notification[type]({
@@ -56,7 +53,6 @@ function Getranke() {
 	const [drinks, setDrinks] = useState([]);
 	const [backupDrinks, setBackupDrinks] = useState([]);
 	const [isAddUser, setIsAddUser] = useState(false);
-	const parent = useRef(null);
 	const [newUser, setNewUser] = useState("");
 	const [autoCompleteSearch, setAutoCompleteSearch] = useState("");
 	let inputElement = useRef(null);
@@ -86,10 +82,6 @@ function Getranke() {
 	useEffect(() => {
 		updateDatabaseState();
 	}, []);
-
-	useEffect(() => {
-		console.log(itemsToCashout);
-	}, [itemsToCashout]);
 
 	useEffect(() => {
 		setBackupDrinks(drinks);
@@ -462,42 +454,50 @@ function Getranke() {
 			/>
 			{/* List */}
 			<Container>
-				<List
-					className="demo-loadmore-list"
-					itemLayout="horizontal"
-					dataSource={filteredUsers.length !== 0 ? filteredUsers : users}
-					renderItem={(userRecord) => (
-						<List.Item
-							key={userRecord.id}
-							className="bg-light p-4 rounded mt-1"
-							actions={[
-								<Button
-									type="link"
-									className="fs-4"
-									onClick={() => setRowDetails(userRecord.id)}
-								>
-									<AddCircleRounded />
-								</Button>,
-								<Tooltip title={`Cash Out ${userRecord.title}`}>
+				<motion.div
+					initial={{ opacity: 0, scale: 0.5 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{
+						duration: 0.8,
+						delay: 0.2,
+						ease: [0, 0.71, 0.2, 1.01],
+					}}
+				>
+					<List
+						className="demo-loadmore-list"
+						itemLayout="horizontal"
+						dataSource={filteredUsers.length !== 0 ? filteredUsers : users}
+						renderItem={(userRecord) => (
+							<List.Item
+								key={userRecord.id}
+								className="bg-light p-4 rounded mt-1"
+								actions={[
 									<Button
 										type="link"
-										className="text-success fs-5"
-										onClick={() => openUserModal(userRecord.id)}
+										className="fs-4"
+										onClick={() => setRowDetails(userRecord.id)}
 									>
-										<MoneyBillWave />
-									</Button>
-								</Tooltip>,
-							]}
-						>
-							<Skeleton
+										<AddCircleRounded />
+									</Button>,
+									<Tooltip title={`Cash Out ${userRecord.title}`}>
+										<Button
+											type="link"
+											className="text-success fs-5"
+											onClick={() => openUserModal(userRecord.id)}
+										>
+											<MoneyBillWave />
+										</Button>
+									</Tooltip>,
+								]}
+							>
+								{/* <Skeleton
 								avatar
 								title={false}
 								loading={userRecord.loading}
 								active
-							>
+							> */}
 								<List.Item.Meta
 									key={userRecord.id + userRecord.title}
-									ref={parent}
 									avatar={
 										<UserOutlined
 											style={{
@@ -524,10 +524,11 @@ function Getranke() {
 									}
 									description={drinksDescriptions(userRecord.id)}
 								/>
-							</Skeleton>
-						</List.Item>
-					)}
-				/>
+								{/* </Skeleton> */}
+							</List.Item>
+						)}
+					/>
+				</motion.div>
 			</Container>
 
 			{/* //! ----------------------------------------------------------------------- ADD DRINK MODAL --------------------------------- */}
@@ -618,7 +619,7 @@ function Getranke() {
 				onCancel={closeUserModal}
 				destroyOnClose={true}
 				afterClose={() => setItemsToCashout([])}
-				// //? -------------------------------------------------------------------------------- MODAL FOOTER ----------------------------------------
+				// //? ----------------------------------------------------------------- MODAL FOOTER ----------------------------------------
 				footer={[
 					<Row justify={"space-between"}>
 						<Popconfirm
@@ -680,7 +681,7 @@ function Getranke() {
 				]}
 			>
 				{/* //? -------------------------------------------------------------------------------- DRINK LIST --------------------------- */}{" "}
-				<div className="my-1 fs-6 px-3 py-2" ref={parentAnimation}>Getränke Liste</div>
+				<div className="my-1 fs-6 px-3 py-2">Getränke Liste</div>
 				{backupDrinks.map((d, i) => {
 					if (d.uid === userSelected) {
 						return (
@@ -762,7 +763,6 @@ function Getranke() {
 export default Getranke;
 
 //BUGS
-//! The removeCashedOutDrinks is deleting the Record instead of updating them
 //! Remove Old Reservations
 
 {

@@ -23,6 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isNotZero, parseTime } from "../../utils/timeHelper";
 import { LoadingOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const { Meta } = Card;
 const format = "HH:mm";
@@ -60,7 +61,7 @@ function Table({
 	setEndTime,
 }) {
 	const [sharedBill, setSharedBill] = useState("2");
-	
+	const [parent, enableAnimations] = useAutoAnimate(/* optional config */);
 
 	function handleChangeInput(val) {
 		setSharedBill(val);
@@ -88,7 +89,6 @@ function Table({
 					disabledTime={disabledRangeTime}
 					hideDisabledOptions={true}
 					placeholder={"Angefangen"}
-					// onClear={() => alert("cleared")}
 					allowClear={false}
 					placement={"bottomRight"}
 					value={isNotZero(table.start) ? dayjs(table.start) : ""}
@@ -156,7 +156,7 @@ function Table({
 	};
 
 	return (
-		<div>
+		<div ref={parent}>
 			{/* <AnimatePresence>
 				<motion.div
 					initial={{ opacity: 0, scale: 0.5 }}
@@ -217,8 +217,9 @@ function Table({
 									>
 										{table.toPay !== 0 && table.toPay}€
 									</span>
-								):
-								("Löschen")}
+								) : (
+									"Löschen"
+								)}
 							</div>
 						</Space>
 					</Popconfirm>,
