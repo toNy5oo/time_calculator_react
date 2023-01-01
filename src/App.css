@@ -1,20 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import '~antd/dist/antd.css';
+@import "~antd/dist/antd.css";
+@import "~antd/dist/antd.dark.css";
+@import "~antd/dist/antd.compact.css";
 .App {
-    padding: 0;
-    margin: 0;
+	padding: 0;
+	margin: 0;
 }
 
 svg {
-    vertical-align: baseline;
+	vertical-align: baseline;
 }
 
 .btn-orange {
-    background-color: orange !important;
+	border-color: darkorange;
+	background-color: orange !important;
 }
 
 .btn-orange:hover {
-    color: black !important;
+	border-color: darkorange;
+	opacity: 80%;
+	color: black !important;
 }

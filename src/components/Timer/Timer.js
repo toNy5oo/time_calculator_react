@@ -47,7 +47,6 @@ function Timer() {
 	useEffect(() => {
 		tables.map((table) => table.isActive && setIsEmpty(false));
 		setActiveTables(countActiveTables().length);
-		// console.log(tables);
 	}, [tables, holdTables]);
 
 	useEffect(() => {
@@ -107,7 +106,7 @@ function Timer() {
 					return {
 						...item,
 						isActive: true,
-						// start: calculateInitalTime()
+						start: calculateInitalTime(),
 					};
 				}
 				return item;

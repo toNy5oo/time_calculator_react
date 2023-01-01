@@ -18,11 +18,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
 import { Avatar, Card, TimePicker } from "antd";
-import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AnimatePresence, motion } from "framer-motion";
 import { isNotZero, parseTime } from "../../utils/timeHelper";
 import { LoadingOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const { Meta } = Card;
 const format = "HH:mm";
@@ -46,7 +46,7 @@ function range(start, end) {
 
 function disabledRangeTime() {
 	return {
-		disabledHours: () => range(0, 18),
+		disabledHours: () => range(0, 14),
 	};
 }
 
@@ -87,10 +87,10 @@ function Table({
 					disabledTime={disabledRangeTime}
 					hideDisabledOptions={true}
 					placeholder={"Angefangen"}
-					onClear={() => alert("cleared")}
+					// onClear={() => alert("cleared")}
 					allowClear={false}
 					placement={"bottomRight"}
-					value={isNotZero(table.start) ? moment(table.start) : ""}
+					value={isNotZero(table.start) ? dayjs(table.start) : ""}
 				/>{" "}
 				<TimePicker
 					bordered={false}
@@ -103,7 +103,7 @@ function Table({
 					placeholder={"Fertig"}
 					placement={"bottomRight"}
 					disabled={isNotZero(table.start) ? false : true}
-					value={table.end !== 0 ? moment(table.end) : ""}
+					value={table.end !== 0 ? dayjs(table.end) : ""}
 					renderExtraFooter={() => (
 						<Button
 							size="small"

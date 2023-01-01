@@ -1,5 +1,5 @@
 import React from "react";
-import { InputNumber } from "antd";
+import { Button, InputNumber, Space } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
@@ -32,20 +32,21 @@ const DrinkToAdd = ({
 	};
 
 	return (
-		<>
+		<div className="mx-1">
+			<Button danger onClick={() => onDelete(drinkId)}>
+				<Space>
+					<FontAwesomeIcon icon={faXmark} />
+					<span>{drinkName}</span>
+				</Space>
+			</Button>
 			<InputNumber
-				style={{ width: "220px", textAlign: "center", margin: "0 10px" }}
-				addonBefore={drinkName}
-				addonAfter={
-					<a className="text-danger" onClick={() => onDelete(drinkId)}>
-						<FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
-					</a>
-				}
+				className="text-center"
+				style={{width: "48px"}}
 				min={1}
 				defaultValue={1}
 				onChange={changeHandler(drinkId)}
 			/>
-		</>
+		</div>
 	);
 };
 

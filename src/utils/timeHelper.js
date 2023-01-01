@@ -8,11 +8,11 @@ export const calculateInitalTime = () => {
 	const now = dayjs();
 	const minutes = dayjs().minute();
 	console.log("Minutes =>", minutes);
-	const multiplier = parseInt(minutes / 5);
-	console.log("Multiplier =>", multiplier);
-	now.minute(5 * multiplier);
+	const mutiplier = parseInt(minutes / 5);
+	console.log("Multiplier =>", mutiplier);
+	now.minute(now.minute() - mutiplier);
 	console.log(dayjs(now, "HH:mm"));
-	return dayjs(now, "HH:mm");
+	return dayjs(dayjs().minute(5 * mutiplier), "HH:mm");
 	// return now.format("DD/MM/YYYY HH:mm");
 };
 

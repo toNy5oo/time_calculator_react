@@ -42,7 +42,7 @@ const Header = ({ users, setFilteredUsers, addUser, inputElement, setIsAddUser, 
         <Row justify="space-between" className="bg-light rounded my-3">
           <Col className="m-4">
             <Space>
-              {/* <div>Suchen</div> */}
+            <span className="fs-6 text-muted mx-2">Such mitglieder bei Name</span>
               <Input
                 prefix={<SearchOutlined />}
                 className='input'

@@ -8,5 +8,7 @@ export const findUserName = (userID, users) => {
 };
 
 export const userHasActiveDrinks = (userID, drinks) => {
-	drinks.filter((drink) => drink.uid === userID)
-}  
+	const drinksOfSingleUser = drinks.filter((drink) => drink.uid === userID);
+	console.log(drinksOfSingleUser);
+	return drinksOfSingleUser.length > 0 ? true : false;
+};

@@ -391,7 +391,7 @@ function Reservierungen() {
 				// onOk={editBooking}
 				onCancel={cancelEdit}
 				destroyOnClose={true}
-				footer={() => {}}
+				footer={null}
 			>
 				<Form name="editForm" onFinish={editBooking} layout="vertical">
 					<Row gutter={16}>
