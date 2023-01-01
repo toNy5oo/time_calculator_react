@@ -19,7 +19,7 @@ import {
 import React, { useState } from "react";
 import { Avatar, Card, TimePicker } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AnimatePresence, motion } from "framer-motion";
+// import { AnimatePresence, motion } from "framer-motion";
 import { isNotZero, parseTime } from "../../utils/timeHelper";
 import { LoadingOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -60,6 +60,7 @@ function Table({
 	setEndTime,
 }) {
 	const [sharedBill, setSharedBill] = useState("2");
+	
 
 	function handleChangeInput(val) {
 		setSharedBill(val);
@@ -155,131 +156,124 @@ function Table({
 	};
 
 	return (
-		<>
-			<AnimatePresence>
+		<div>
+			{/* <AnimatePresence>
 				<motion.div
 					initial={{ opacity: 0, scale: 0.5 }}
 					animate={{ opacity: 1, scale: 1 }}
 					exit={{ opacity: 0, scale: -0.5 }}
 					transition={{ ease: "easeOut", duration: 0.5 }}
-				>
-					<Card
-						type="inner"
-						title={headCard}
-						className="p-1 rounded"
-						style={{
-							minWidth: 300,
-							maxWidth: 325,
-						}}
-						extra={
-							table.played ? (
-								<div className={`fw-semibold ${table.toPay && "text-primary"}`}>
-									{parseTime(table.played)}{" "}
-								</div>
-							) : (
-								<Spin tip="Spielen..." indicator={antIcon} size="small" />
-							)
-						}
-						actions={[
-							<Popconfirm
-								title="Der Tisch wird wieder verfügbar, die offene Zahlung findest du in offene Rechnungen"
-								okText="Yes"
-								cancelText="No"
-								onConfirm={() => addHoldTable(table.tableNumber)}
-							>
-								<Space direction="vertical">
-									<FontAwesomeIcon icon={faToggleOff} />
-									<div>Behalten</div>
-								</Space>
-							</Popconfirm>,
-							<Space
-								direction="vertical"
-								onClick={table.toPay && showTotalModal}
-							>
-								<FontAwesomeIcon
-									icon={faPeopleGroup}
-									style={{
-										fontSize: "20px",
-									}}
-								/>
-								<div>Teilen</div>
-							</Space>,
-							<Popconfirm
-								title="Are you sure delete this task?"
-								okText="Yes"
-								cancelText="No"
-								onConfirm={() => closeTable(table.tableNumber, true)}
-							>
-								<Space direction="vertical">
-									<FontAwesomeIcon icon={faMoneyBillWave} />
-									<div>
-										{table.toPay !== 0 && (
-											<span
-												className={`fw-bold ${
-													table.toPay && "text-primary mx-2"
-												}`}
-											>
-												{table.toPay !== 0 && table.toPay}€
-											</span>
-										)}
-									</div>
-								</Space>
-							</Popconfirm>,
-						]}
+				> */}
+			<Card
+				type="inner"
+				title={headCard}
+				className="p-1 rounded"
+				style={{
+					minWidth: 300,
+					maxWidth: 325,
+				}}
+				extra={
+					table.played ? (
+						<div className={`fw-semibold ${table.toPay && "text-primary"}`}>
+							{parseTime(table.played)}{" "}
+						</div>
+					) : (
+						<Spin tip="Spielen..." indicator={antIcon} size="small" />
+					)
+				}
+				actions={[
+					<Popconfirm
+						title="Der Tisch wird wieder verfügbar, die offene Zahlung findest du in offene Rechnungen"
+						okText="Yes"
+						cancelText="No"
+						onConfirm={() => addHoldTable(table.tableNumber)}
 					>
-						{/* Inside parts of the card */}
-						<Meta
-							className="mt-1 mb-2"
-							avatar={
-								<FontAwesomeIcon
-									icon={faHourglassHalf}
-									style={{ fontSize: "25px", color: "#666" }}
-								/>
-							}
-							title={<div className="text-muted"> Zeit </div>}
-							description={descCardTime}
-						/>{" "}
-						<Meta
-							className="my-2"
-							avatar={
-								<FontAwesomeIcon
-									icon={faPercent}
-									style={{ fontSize: "25px", color: "#666" }}
-								/>
-							}
-							title={<div className="text-muted"> Rabatt </div>}
-							description={descCardDiscount}
-						/>{" "}
-						<Modal
-							title={`Geteilte Rechnung | Tisch ${table.tableNumber} - ${table.toPay}`}
-							open={isTotalModalOpen}
-							onOk={handleTotalOk}
-							onCancel={handleTotalCancel}
-						>
-							<div className="d-flex flex-column justify-content-center align-items-center">
-								<div>
-									<p> Anzahl Personen </p>{" "}
-									<InputNumber
-										onStep={handleChangeInput}
-										min={2}
-										defaultValue={2}
-									/>{" "}
-								</div>{" "}
-								<Divider> Total per person </Divider>{" "}
-								<div>
-									<Tag
-										color="blue"
-										style={{ fontSize: "20px", padding: "10px" }}
+						<Space direction="vertical">
+							<FontAwesomeIcon icon={faToggleOff} />
+							<div>Behalten</div>
+						</Space>
+					</Popconfirm>,
+					<Space direction="vertical" onClick={table.toPay && showTotalModal}>
+						<FontAwesomeIcon
+							icon={faPeopleGroup}
+							style={{
+								fontSize: "14px",
+							}}
+						/>
+						<div>Teilen</div>
+					</Space>,
+					<Popconfirm
+						title="Hatten die Gäste bezhalt?"
+						okText="Yes"
+						cancelText="No"
+						onConfirm={() => closeTable(table.tableNumber, true)}
+					>
+						<Space direction="vertical">
+							<FontAwesomeIcon icon={faMoneyBillWave} />
+							<div>
+								{table.toPay !== 0 ? (
+									<span
+										className={`fw-bold ${table.toPay && "text-primary mx-2"}`}
 									>
-										€{(table.toPay / sharedBill).toFixed(2)}{" "}
-									</Tag>{" "}
-								</div>{" "}
-							</div>{" "}
-						</Modal>{" "}
-					</Card>
-				</motion.div>
-			</AnimatePresence>
-		</>
+										{table.toPay !== 0 && table.toPay}€
+									</span>
+								):
+								("Löschen")}
+							</div>
+						</Space>
+					</Popconfirm>,
+				]}
+			>
+				{/* Inside parts of the card */}
+				<Meta
+					className="mt-1 mb-2"
+					avatar={
+						<FontAwesomeIcon
+							icon={faHourglassHalf}
+							style={{ fontSize: "25px", color: "#666" }}
+						/>
+					}
+					title={<div className="text-muted"> Zeit </div>}
+					description={descCardTime}
+				/>{" "}
+				<Meta
+					className="my-2"
+					avatar={
+						<FontAwesomeIcon
+							icon={faPercent}
+							style={{ fontSize: "25px", color: "#666" }}
+						/>
+					}
+					title={<div className="text-muted"> Rabatt </div>}
+					description={descCardDiscount}
+				/>{" "}
+				<Modal
+					title={`Geteilte Rechnung | Tisch ${table.tableNumber} - ${table.toPay}`}
+					open={isTotalModalOpen}
+					onOk={handleTotalOk}
+					onCancel={handleTotalCancel}
+				>
+					<div className="d-flex flex-column justify-content-center align-items-center">
+						<div>
+							<p> Anzahl Personen </p>{" "}
+							<InputNumber
+								onStep={handleChangeInput}
+								min={2}
+								defaultValue={2}
+							/>{" "}
+						</div>{" "}
+						<Divider> Total per person </Divider>{" "}
+						<div>
+							<Tag color="blue" style={{ fontSize: "20px", padding: "10px" }}>
+								€{(table.toPay / sharedBill).toFixed(2)}{" "}
+							</Tag>{" "}
+						</div>{" "}
+					</div>{" "}
+				</Modal>{" "}
+			</Card>
+			{/* </motion.div>
+			</AnimatePresence> */}
+		</div>
 	);
 }
 

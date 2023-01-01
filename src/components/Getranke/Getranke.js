@@ -29,10 +29,13 @@ import {
 	userHasActiveDrinks,
 } from "../../utils/drinksHelper";
 import { AddCircleRounded, MoneyBillWave, RemoveCircleRounded } from "./Icons";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const options = drinklist.map((d) => ({ value: d.label, id: d.key }));
 
 function Getranke() {
+	const [parentAnimation, enableAnimations] =
+		useAutoAnimate(/* optional config */);
 	//Notification
 	const showNotification = (type, title, msg) => {
 		notification[type]({
@@ -677,12 +680,13 @@ function Getranke() {
 				]}
 			>
 				{/* //? -------------------------------------------------------------------------------- DRINK LIST --------------------------- */}{" "}
-				<div className="my-1 fs-6 px-3 py-2">Getränke Liste</div>
+				<div className="my-1 fs-6 px-3 py-2" ref={parentAnimation}>Getränke Liste</div>
 				{backupDrinks.map((d, i) => {
 					if (d.uid === userSelected) {
 						return (
 							<>
 								<Row
+									key={d.uid + d.key}
 									justify={"space-between"}
 									align={"middle"}
 									className="my-1 bg-light p-2 px-3 rounded text-muted fs-6"

@@ -7,6 +7,7 @@ import { SmileOutlined } from "@ant-design/icons";
 import { DEFAULT_TEMPLATE } from "../../components/assets/data/tablesArray";
 import * as price from "../assets/data/const";
 import dayjs from "dayjs";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
 	calculateInitalTime,
 	isNotZero,
@@ -29,6 +30,7 @@ const holdTableNotification = (num, message, desc) => {
 };
 
 function Timer() {
+	const [parent, enableAnimations] = useAutoAnimate(/* optional config */);
 	const [tables, setTables] = React.useState(
 		localStorage.getItem("tables")
 			? JSON.parse(localStorage.getItem("tables"))
@@ -259,20 +261,26 @@ function Timer() {
 					<Col className="p-5 text-center fs-5"> No active tables </Col>{" "}
 				</Row>
 			) : (
-				<Row justify="space-around" align="center" className="mx-5 mt-3">
+				<Row
+					justify="space-around"
+					align="center"
+					className="mx-5 mt-3"
+					
+				>
 					{tables.map(
 						(table) =>
 							table.isActive && (
 								<Col
-									key={table.tableNumber + Math.random()}
+									key={`key${table.tableNumber}`}
 									xs={24}
 									sm={12}
 									xl={6}
 									className="p-1 my-3 d-flex justify-content-around"
+									ref={parent}
 								>
 									<Table
 										table={table}
-										key={table.tableNumber}
+										key={table.tableNumber+Math.random()}
 										closeTable={closeTable}
 										startTime={startTime}
 										endTime={endTime}
