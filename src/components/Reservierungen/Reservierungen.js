@@ -74,6 +74,22 @@ function Reservierungen() {
 				.orderBy("date", "asc")
 				.get();
 
+			/** Removes past bookings */
+			const pastBookings = databaseResponse.filter((e) =>
+				moment(e.date, "DD/MM/YYYY").isBefore(
+					moment(moment().subtract(2, "day"), "DD/MM/YYYY")
+				)
+			);
+
+			// * Removes the bookings older than 2 days
+			pastBookings?.map(async (b) => {
+				try {
+					await db.collection(collName).doc({ id: b.id }).delete();
+				} catch (error) {
+					console.log(error);
+				}
+			});
+
 			/** Filter records starting from today */
 			const bookingsFromToday = databaseResponse.filter((e) =>
 				moment(e.date, "DD/MM/YYYY").isAfter(
