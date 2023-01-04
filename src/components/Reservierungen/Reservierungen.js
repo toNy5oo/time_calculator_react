@@ -12,17 +12,14 @@ import {
 	Modal,
 	notification,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+
 import moment from "moment";
 import Localbase from "localbase";
-import { Container } from "react-bootstrap";
 import Booking from "./BookingDate";
 import {
 	disabledDate,
 	disabledDateTime,
-	options,
 	parseDate,
-	showSelectedDays,
 } from "../../utils/bookingHelper";
 import {
 	ADD_ERR,
@@ -41,15 +38,19 @@ import {
 	EDIT_SUCC_DESC,
 	EDIT_SUCC_TITLE,
 } from "./string";
+import { PageHeader } from "./PageHeader";
 
 function Reservierungen() {
+	const [data, setData] = useState([]);
 	const [bookings, setBookings] = useState([]);
+	const [oldBookings, setOldBookings] = useState([]);
 	const [uniqueDates, setUniqueDates] = useState([]);
+	const [uniqueOldDates, setUniqueOldDates] = useState([]);
 	const [editRecord, setEditRecord] = useState([]);
 	const [interval, setInterval] = useState(
 		moment().add(3, "days").format("DD/MM/YYYY")
 	);
-
+	const [isActualBookings, setIsActualBookings] = useState(true);
 	const EMPTY_STRING = "";
 	const [open, setOpen] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,80 +62,130 @@ function Reservierungen() {
 	db.config.debug = false;
 
 	useEffect(() => {
-		fetchDBBookingsData();
-	}, [interval]);
+		getDBdata();
+	}, []);
+
+	useEffect(() => {
+		console.log("Data ", data);
+		setBookingsArrays();
+	}, [data]);
 
 	// ! -------------------------------------- FETCHING DATA
 
-	/** Fetch the reservations from the DB sorted by date to pay in ascending order*/
-	async function fetchDBBookingsData() {
+	const getDBdata = async () => {
 		try {
 			const databaseResponse = await db
 				.collection(collName)
 				.orderBy("date", "asc")
 				.get();
 
-			/** Removes past bookings */
-			const pastBookings = databaseResponse.filter((e) =>
-				moment(e.date, "DD/MM/YYYY").isBefore(
-					moment(moment().subtract(2, "day"), "DD/MM/YYYY")
-				)
-			);
-
-			// * Removes the bookings older than 2 days
-			pastBookings?.map(async (b) => {
-				try {
-					await db.collection(collName).doc({ id: b.id }).delete();
-				} catch (error) {
-					console.log(error);
-				}
-			});
-
-			/** Filter records starting from today */
-			const bookingsFromToday = databaseResponse.filter((e) =>
-				moment(e.date, "DD/MM/YYYY").isAfter(
-					moment(moment().subtract(1, "day"), "DD/MM/YYYY")
-				)
-			);
-
-			/** Filter records by SelectedInterval of amount of reservations to show */
-			const filtered = bookingsFromToday.filter((e) =>
-				moment(e.date, "DD/MM/YYYY").isBefore(moment(interval, "DD/MM/YYYY"))
-			);
-
-			//Get unique list of dates
-			const dateSet = new Set();
-
-			for (const booking of filtered) {
-				dateSet.add(booking.date);
-			}
-
-			//Create array from SET
-			const dateArray = Array.from(dateSet);
-			/** Ordering array by dates with moment objects */
-			setUniqueDates(
-				Array.from(
-					dateArray.sort((a, b) =>
-						moment(a, "DD/MM/YYYY").diff(moment(b, "DD/MM/YYYY"))
+			setData(
+				databaseResponse.filter((e) =>
+					moment(e.date, "DD/MM/YYYY").isAfter(
+						moment(moment().subtract(30, "day"), "DD/MM/YYYY")
 					)
 				)
 			);
-			getOrderedBookings(databaseResponse, dateSet);
+			removeOldBookingFromDB(databaseResponse);
 		} catch (error) {
 			console.log("error: ", error);
 		}
-	}
+	};
 
-	const getOrderedBookings = (bookingsDB, dateSet) => {
+	const setBookingsArrays = () => {
+		const bookingsFromToday = data.filter((e) =>
+			moment(e.date, "DD/MM/YYYY").isAfter(
+				moment(moment().subtract(1, "day"), "DD/MM/YYYY")
+			)
+		);
+
+		/** Gets records until today */
+		const bookingsUntilToday = data.filter((e) =>
+			moment(e.date, "DD/MM/YYYY").isBefore(
+				moment(moment().subtract(1, "day"), "DD/MM/YYYY")
+			)
+		);
+
+		let dateSet = new Set();
+
+		for (const booking of bookingsFromToday) {
+			dateSet.add(booking.date);
+		}
+		//Create array from SET
+		const uniqueActualDates = Array.from(dateSet).sort((a, b) =>
+			moment(a, "DD/MM/YYYY").isAfter(moment(b, "DD/MM/YYYY"))
+		);
+
+		dateSet = new Set();
+
+		for (const booking of bookingsUntilToday) {
+			dateSet.add(booking.date);
+		}
+		//Create array from SET
+		const uniqueOldDates = Array.from(dateSet).sort((a, b) =>
+			moment(a, "DD/MM/YYYY").isAfter(moment(b, "DD/MM/YYYY"))
+		);
+
+		const orderedActualBookings = getOrderedBookings(
+			bookingsFromToday,
+			uniqueActualDates
+		);
+
+		const orderedOldBookings = getOrderedBookings(
+			bookingsUntilToday,
+			uniqueOldDates
+		);
+
+		setBookings(orderedActualBookings);
+		setOldBookings(orderedOldBookings);
+
+		setUniqueDates(createDatesArray(bookingsFromToday));
+		setUniqueOldDates(createDatesArray(bookingsUntilToday));
+	};
+
+	const removeOldBookingFromDB = (databaseResponse) => {
+		/** Removes past bookings */
+		const pastBookings = databaseResponse.filter((e) =>
+			moment(e.date, "DD/MM/YYYY").isBefore(
+				moment(moment().subtract(1, "month"), "DD/MM/YYYY")
+			)
+		);
+
+		// * Removes the bookings older than 30 days
+		pastBookings?.map(async (b) => {
+			try {
+				await db.collection(collName).doc({ id: b.id }).delete();
+			} catch (error) {
+				console.log(error);
+			}
+		});
+	};
+
+	const createDatesArray = (response) => {
+		//Get unique list of dates
+		const dateSet = new Set();
+
+		for (const booking of response) {
+			dateSet.add(booking.date);
+		}
+		//Create array from SET
+		return Array.from(dateSet).sort((a, b) =>
+			moment(a, "DD/MM/YYYY").isAfter(moment(b, "DD/MM/YYYY"))
+		);
+	};
+
+	const getOrderedBookings = (b, dateSet) => {
+		console.log(b);
+		console.log(dateSet);
 		/** Creates a subarray for each single date and add that to OrderedArray */
+
 		const orderedBookings = [];
 		for (const date of dateSet) {
-			const singleDateBookings = bookingsDB.filter(
-				(booking) => booking.date === date
-			);
+			const singleDateBookings = b.filter((booking) => booking.date === date);
 			orderedBookings.push(singleDateBookings);
 		}
-		setBookings(orderedBookings);
+		console.log(orderedBookings);
+		return orderedBookings;
 	};
 
 	/**
@@ -149,7 +200,7 @@ function Reservierungen() {
 			showNotification(ADD_ERR, ADD_ERR_TITLE, ADD_ERR_DESC);
 			console.log("There was an error, do something else.");
 		}
-		fetchDBBookingsData();
+		getDBdata();
 		onClose();
 	}
 
@@ -165,7 +216,7 @@ function Reservierungen() {
 			showNotification(EDIT_ERR, EDIT_ERR_TITLE, EDIT_ERR_DESC);
 			console.log("There was an error, do something else.");
 		}
-		fetchDBBookingsData();
+		getDBdata();
 		onClose();
 	}
 
@@ -252,7 +303,7 @@ function Reservierungen() {
 		try {
 			const response = await db.collection(collName).doc({ id: id }).delete();
 			//If the response is successful then remove the drinks from this user from the list
-			response.success && fetchDBBookingsData();
+			response.success && getDBdata();
 			showNotification(DEL_SUCC, DEL_SUCC_TITLE, DEL_SUCC_DESC);
 		} catch (error) {
 			console.log("Error: ", error);
@@ -263,38 +314,24 @@ function Reservierungen() {
 		console.log(recordID);
 	};
 
+	const showOldBookings = () => {
+		setIsActualBookings(!isActualBookings);
+	};
+
 	// ! -------------------------------------- RENDER
 
 	return (
 		<>
-			<Container>
-				<Row
-					justify={"space-between"}
-					align={"middle"}
-					className="bg-light rounded my-3"
-				>
-					<Col className="m-4">
-						<span className="fs-6 text-muted mx-2">
-							Zeig reservierungen für
-						</span>
-						<Select
-							defaultValue="3"
-							style={{ width: 120 }}
-							onChange={showSelectedDays}
-							options={options}
-						></Select>
-					</Col>
-					<Col className="m-4">
-						<Button type="primary" icon={<PlusOutlined />} onClick={showDrawer}>
-							{" "}
-							Reservationen hinzufügen
-						</Button>
-					</Col>
-				</Row>
-			</Container>
-
-			{bookings?.length > 0 ? (
-				bookings?.map((singleDateArray, index) => (
+			<PageHeader
+				showSelectedDays={showSelectedDays}
+				showDrawer={showDrawer}
+				showOldBookings={showOldBookings}
+				isActualBookings={isActualBookings}
+			/>
+			{/* //! ------------------------------ Actual bookings ------------------------------ */}
+			{isActualBookings &&
+				bookings.length > 0 &&
+				bookings.map((singleDateArray, index) => (
 					<Booking
 						key={index + singleDateArray.length}
 						bookings={singleDateArray}
@@ -302,16 +339,26 @@ function Reservierungen() {
 						showEditModal={showEditModal}
 						deleteBooking={deleteBooking}
 						repeatBooking={repeatBooking}
+						isActualBookings={isActualBookings}
 					/>
-				))
-			) : (
-				<Empty />
-			)}
-
+				))}
+			{/* //! ------------------------------ Old bookings ------------------------------ */}
+			{!isActualBookings &&
+				oldBookings?.length > 0 &&
+				oldBookings?.map((singleDateArray, index) => (
+					<Booking
+						key={index + singleDateArray.length}
+						bookings={singleDateArray}
+						date={uniqueOldDates[index]}
+						showEditModal={null}
+						deleteBooking={null}
+						repeatBooking={null}
+						isActualBookings={isActualBookings}
+					/>
+				))}
 			{/* //!--------------------------------------------------- DRAWER */}
-
 			<Drawer
-				title="Neue Reservierungen"
+				title={"Neue Reservierung"}
 				width={720}
 				onClose={onClose}
 				open={open}
@@ -396,9 +443,7 @@ function Reservierungen() {
 					</Row>
 				</Form>
 			</Drawer>
-
 			{/* //!--------------------------------------------------- MODAL */}
-
 			<Modal
 				title="Reservierung Bearbeiten"
 				open={isModalOpen}

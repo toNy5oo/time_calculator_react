@@ -16,19 +16,40 @@ import {
 	Col,
 	Popconfirm,
 } from "antd";
-import { UserOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+	UserOutlined,
+	PlusOutlined,
+	SearchOutlined,
+	BarsOutlined,
+} from "@ant-design/icons";
 import { DRINKS as drinklist } from "../assets/data/drinkList";
 import { Container } from "react-bootstrap/";
 import DrinkToAdd from "./DrinkToAdd";
 import Header from "./Header";
 import {
 	belongsToUser,
+	calculateCashOut,
+	computeDrinksTotalToPay,
 	findUserName,
+	isEverythingSelected,
+	selectAllDrinksToBePaid,
+	setBackupArrayForTotalCashout,
 	totalPerDrink,
 	userHasActiveDrinks,
 } from "../../utils/drinksHelper";
 import { AddCircleRounded, MoneyBillWave, RemoveCircleRounded } from "./Icons";
 import { motion } from "framer-motion";
+import {
+	ADDUSR_ERR_SUBT,
+	ADDUSR_ERR_TITL,
+	ADDUSR_ERR_TYPE,
+	EMPTY_STR_SUBT,
+	EMPTY_STR_TITL,
+	EMPTY_STR_TYPE,
+	NAME_EX_TITL,
+	NAME_EX_TYPE,
+	NAME_EX__SUBT,
+} from "./strings";
 
 const options = drinklist.map((d) => ({ value: d.label, id: d.key }));
 
@@ -60,6 +81,8 @@ function Getranke() {
 	const [isDrinkModalOpen, setIsDrinkModalOpen] = useState(false);
 	const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
+	//!------------------------------------------------------------------------ MODAL AND DRAWER UTILS -------------------------
+
 	const hideDrinkModal = () => {
 		setIsDrinkModalOpen(false);
 	};
@@ -79,6 +102,8 @@ function Getranke() {
 		setIsUserModalOpen(false);
 	};
 
+	//!------------------------------------------------------------------------ USE_EFFECT -------------------------
+
 	useEffect(() => {
 		updateDatabaseState();
 	}, []);
@@ -87,20 +112,12 @@ function Getranke() {
 		setBackupDrinks(drinks);
 	}, [drinks]);
 
+	//!------------------------------------------------------------------------ DB FUNCTIONS -------------------------
+
 	const updateDatabaseState = () => {
 		fetchDBDrinksData();
 		fetchDBUsersData();
 	};
-	/** Fetch the users from the DB sorted by amount to pay in descending order */
-	async function fetchDBUsersData() {
-		try {
-			let usersDB = await db.collection("users").orderBy("toPay", "desc").get();
-			usersDB && setUsers(usersDB);
-		} catch (error) {
-			console.log("error: ", error);
-		}
-	}
-
 	async function fetchDBDrinksData() {
 		try {
 			let drinksDB = await db.collection("drinks").get();
@@ -109,6 +126,18 @@ function Getranke() {
 			console.log("Error: ", error);
 		}
 	}
+
+	/** Fetch the users from the DB sorted by amount to pay in descending order */
+	async function fetchDBUsersData() {
+		try {
+			let usersDB = await db.collection("users").orderBy("title", "asc").get();
+			usersDB && setUsers(usersDB);
+		} catch (error) {
+			console.log("error: ", error);
+		}
+	}
+
+	//! --------------------------------------------------------------------------------------------- UTILS -------------------------------------------------------
 
 	/** Get the id of the user and set it as selected user */
 	const setRowDetails = (userId) => {
@@ -124,8 +153,6 @@ function Getranke() {
 		hideDrinkModal();
 	};
 
-	//! --------------------------------------------------------------------------------------------- UTILS -------------------------------------------------------
-
 	const calculatUserAmount = (userID) => {
 		// get document by key
 		let totalAmount = 0;
@@ -140,12 +167,6 @@ function Getranke() {
 	function nameAlreadyExists() {
 		return users.some((e) => e.title.toUpperCase() === newUser.toUpperCase());
 	}
-
-	//* Sums up the items into the cashout array
-	const calculateCashOut = () =>
-		itemsToCashout
-			.reduce((acc, val) => acc + val.price * val.amount, 0)
-			.toFixed(2);
 
 	/**
 	 *
@@ -170,7 +191,27 @@ function Getranke() {
 					(d) =>
 						d.uid === id && <Tag color="blue">{d.amount + " " + d.label}</Tag>
 			  )
-			: "Keine Getranke";
+			: "Keine Getränke";
+	};
+
+	// * Checks if the item has been added to the Cashout array
+	const isAddedToCashout = (drinkID) =>
+		itemsToCashout.findIndex(
+			(e) => e.key === drinkID && e.uid === userSelected
+		) !== -1
+			? true
+			: false;
+
+	const isAllinCashout = (drinkID) => {
+		if (isAddedToCashout(drinkID)) {
+			const [drink] = drinks?.filter(
+				(d) => d.key === drinkID && d.uid === userSelected
+			);
+			const [cashoutDrink] = itemsToCashout?.filter(
+				(d) => d.key === drinkID && d.uid === userSelected
+			);
+			return cashoutDrink?.amount === drink.amount ? true : false;
+		} else return false;
 	};
 
 	//! --------------------------------------------------------------------------------------------- USERS -------------------------------------------------------
@@ -182,29 +223,24 @@ function Getranke() {
 	// ? Checked
 	const addUserToDB = async () => {
 		if (nameAlreadyExists()) {
-			showNotification(
-				"warning",
-				"User already present",
-				"There is already a user with the name " + newUser
-			);
+			showNotification(NAME_EX_TYPE, NAME_EX_TITL, NAME_EX__SUBT + newUser);
 			return;
 		}
 		if (newUser === "") {
-			showNotification(
-				"warning",
-				"No name entered",
-				"Please provide a name for the new mitglieder"
-			);
+			showNotification(EMPTY_STR_TYPE, EMPTY_STR_TITL, EMPTY_STR_SUBT);
 			return;
 		}
 		//Unique ID
 		const uniqueID = Math.floor(Math.random() * Date.now());
 		try {
-			const response = await db.collection("users").add({
-				id: uniqueID,
-				title: newUser,
-				toPay: 0,
-			});
+			const response = await db.collection("users").add(
+				{
+					id: uniqueID,
+					title: newUser,
+					toPay: 0,
+				},
+				newUser + "_" + uniqueID //? <-- Key for the user in the DATABASE
+			);
 			if (response.success) {
 				fetchDBUsersData();
 				setIsAddUser(false);
@@ -213,11 +249,7 @@ function Getranke() {
 				showDrinkModal();
 			}
 		} catch (err) {
-			showNotification(
-				"warning",
-				"User not added",
-				"An error occurred during the operation. Please try again"
-			);
+			showNotification(ADDUSR_ERR_TYPE, ADDUSR_ERR_TITL, ADDUSR_ERR_SUBT);
 			console.error(err);
 		}
 	};
@@ -226,13 +258,13 @@ function Getranke() {
 
 	const addDrinkToTemporaryList = (e, drinkID) => {
 		e?.preventDefault();
+		// * Get the drink description
 		const [drink] = drinklist.filter((d) => d.key === drinkID);
-		console.log(drink);
-		//Add the standard amount of drinks = 1
+		// * Add the standard amount of drinks = 1
 		drink.amount = 1;
-		//Add the ID of the selected user
+		// * Add the ID of the selected user
 		drink.uid = userSelected;
-		//Add to the list of drinks to add to the current selected User
+		// * Add to the list of drinks to add to the current selected User
 		addToUser.findIndex((el) => el.key === drink.key) === -1
 			? setAddToUser((prevState) => [...prevState, drink])
 			: showNotification(
@@ -246,33 +278,39 @@ function Getranke() {
 	 *   Add the temporary array of selected drinks with a current userSelected to the drinks array mirroring the db
 	 */
 	async function addDrinksToUser() {
-		//Create temp array with drinks from selectedUser
-		let existingDrinks = drinks.filter((drink) => drink.uid === userSelected);
+		//? Exit if there is nothing in the array of the drinks to be added */
+		if (addToUser.length <= 0) {
+			showNotification(
+				"error",
+				"Fehler",
+				"Es gibt keine getränke ausgewählt " + findUserName(userSelected, users)
+			);
+			return;
+		}
 
-		if (addToUser.length > 0) {
+		// * Create temp array with drinks from selectedUser
+		let userDrinksRecords = drinks.filter(
+			(drink) => drink.uid === userSelected
+		);
+
+		try {
 			addToUser.forEach(async (drinkToAdd) => {
-				let [currentDrink] = existingDrinks.filter(
+				let [currentDrink] = userDrinksRecords.filter(
 					(el) => drinkToAdd.key === el.key
 				);
-
-				if (!currentDrink) {
-					//Create a new record
-					try {
-						await db.collection("drinks").add(drinkToAdd);
-					} catch (error) {
-						console.log("There was an error, do something else.");
-					}
-				} else {
-					//update the amount
+				if (!currentDrink)
+					// * Create a new record
+					await db.collection("drinks").add(drinkToAdd);
+				// * Update the amount
+				else {
 					currentDrink.amount += drinkToAdd.amount;
-					//update the doc on the db
 					try {
 						await db
 							.collection("drinks")
 							.doc({ uid: userSelected, key: drinkToAdd.key })
 							.update({ amount: currentDrink.amount });
-					} catch (error) {
-						console.log("There was an error, do something else.");
+					} catch (err) {
+						console.log(err);
 					}
 				}
 				//Updates values in APP with DB data
@@ -282,45 +320,51 @@ function Getranke() {
 				//Reset userSelected
 				resetRowDetails();
 			});
-			showNotification(
-				"success",
-				"Getränke hinzufügen",
-				"Getränke sind an der mitglieder " +
-					findUserName(userSelected, users) +
-					" hinzufügen"
-			);
-		} else {
-			showNotification(
-				"error",
-				"Fehler",
-				"Es gibt keine getränke ausgewählt " + findUserName(userSelected, users)
-			);
+		} catch (error) {
+			console.log("There was an error, do something else. ", error);
 		}
+
+		addAmountToPay(addToUser);
+
+		showNotification(
+			"success",
+			"Getränke hinzufügen",
+			"Getränke sind an der mitglieder " +
+				findUserName(userSelected, users) +
+				" hinzufügen"
+		);
 	}
+
+	const addAmountToPay = async (drinks) => {
+		try {
+			// * Get the record from the selected user
+			const userRecord = await db
+				.collection("users")
+				.doc({ id: userSelected })
+				.get();
+			let ext_total = userRecord.toPay;
+
+			const total = drinks.reduce(
+				(prev, current) => prev + current.price * current.amount,
+				ext_total
+			);
+
+			// * Update DB data by key
+			await db
+				.collection("users")
+				.doc(`${userRecord.title}_${userRecord.id}`) //? <-- Key on the DB
+				.update({
+					toPay: total,
+				});
+
+			fetchDBUsersData();
+		} catch (err) {
+			console.log("Error, ", err);
+		}
+	};
 
 	//! --------------------------------------------------------------------------------------------- CASH OUT -------------------------------------------------------
 
-	//* Checks if the item has been added to the Cashout array
-	const isAddedToCashout = (drinkID) =>
-		itemsToCashout.findIndex(
-			(e) => e.key === drinkID && e.uid === userSelected
-		) !== -1
-			? true
-			: false;
-
-	const isAllinCashout = (drinkID) => {
-		if (isAddedToCashout(drinkID)) {
-			const [drink] = drinks.filter(
-				(d) => d.key === drinkID && d.uid === userSelected
-			);
-			const [cashoutDrink] = itemsToCashout.filter(
-				(d) => d.key === drinkID && d.uid === userSelected
-			);
-			return cashoutDrink.amount === drink.amount ? true : false;
-		} else return false;
-	};
-
-	/** //!DOES NOT REMOVE THE USER FROM THE UI */
 	const removeCashedOutDrinks = async () => {
 		itemsToCashout.forEach(async (d) => {
 			if (isAllinCashout(d.key)) {
@@ -329,6 +373,7 @@ function Getranke() {
 						.collection("drinks")
 						.doc({ uid: userSelected, key: d.key })
 						.delete();
+					setDrinks(drinks.filter((e) => e.key === d.key && e.uid === d.uid));
 					updateDatabaseState();
 				} catch (err) {
 					console.error(err);
@@ -350,6 +395,7 @@ function Getranke() {
 				}
 			}
 		});
+		updateAmountToPay();
 		closeUserModal();
 		showNotification(
 			"success",
@@ -358,8 +404,88 @@ function Getranke() {
 		);
 	};
 
+	const updateAmountToPay = async () => {
+		try {
+			const total = drinks
+				.filter((d) => d.uid === userSelected)
+				.reduce((prev, current) => prev + current.price * current.amount, 0);
+
+			console.log(total);
+			// * Update DB data by key
+			await db
+				.collection("users")
+				.doc({ id: userSelected }) //? <-- Key on the DB
+				.update({
+					toPay: total,
+				});
+
+			fetchDBUsersData();
+		} catch (err) {
+			console.log("Error, ", err);
+		}
+	};
+
+	// /** //!DOES NOT REMOVE THE USER FROM THE UI */
+	// const removeCashedOutDrinks = async () => {
+	// 	// * Create temp array with drinks from selectedUser
+	// 	let userDrinksRecords = drinks.filter(
+	// 		(drink) => drink.uid === userSelected
+	// 	);
+
+	// 	const updatedDrinks = [];
+
+	// 	// * Creating a temporary array to reflect changes to apply on DB
+	// 	userDrinksRecords.forEach((exDrink) => {
+	// 		const [cashDrink] = itemsToCashout.filter((e) => e.key === exDrink.key);
+	// 		if (cashDrink && exDrink.key === cashDrink.key) {
+	// 			updatedDrinks.push({
+	// 				...exDrink,
+	// 				amount: exDrink.amount - cashDrink.amount,
+	// 			});
+	// 		} else updatedDrinks.push(exDrink);
+	// 	});
+
+	// 	updateAmountToPay(updatedDrinks, userSelected);
+
+	// 	// * Editing or removing reecords
+	// 	updatedDrinks.forEach((drink) => {
+	// 		if (drink.amount !== 0) {
+	// 			try {
+	// 				db.collection("drinks")
+	// 					.doc({ uid: userSelected, key: drink.key })
+	// 					.set({
+	// 						...drink,
+	// 					});
+	// 				updateDatabaseState();
+	// 				console.log("Updated drinks");
+	// 			} catch (err) {
+	// 				console.log("Error ", err);
+	// 			}
+	// 		} else {
+	// 			try {
+	// 				db.collection("drinks")
+	// 					.doc({ uid: userSelected, key: drink.key })
+	// 					.delete();
+	// 				console.log("Deleted record");
+	// 				updateDatabaseState();
+	// 			} catch (err) {
+	// 				console.log("Error ", err);
+	// 			}
+	// 		}
+	// 	});
+
+	// 	closeUserModal();
+	// 	showNotification(
+	// 		"success",
+	// 		"Drinks removed",
+	// 		"Selected drinks have been removed from the list"
+	// 	);
+	// };
+
 	const closeUserTab = async (id) => {
 		/** Delete drinks records only if they exists */
+		closeUserModal();
+
 		if (userHasActiveDrinks(id, drinks)) {
 			//Remove user record
 			try {
@@ -385,7 +511,6 @@ function Getranke() {
 			"User removed",
 			"User has been removed from the active list"
 		);
-		closeUserModal();
 	};
 
 	const addItemToCashout = (drinkID) => {
@@ -435,6 +560,11 @@ function Getranke() {
 				d.key === drinkID ? { ...d, amount: d.amount + 1 } : d
 			)
 		);
+	};
+
+	const payEverything = () => {
+		setItemsToCashout(selectAllDrinksToBePaid(drinks, userSelected));
+		setBackupDrinks(setBackupArrayForTotalCashout(drinks, userSelected));
 	};
 
 	//! --------------------------------------------------------------------------------------------- RENDER -------------------------------------------------------
@@ -516,7 +646,7 @@ function Getranke() {
 												<div className="fs-6">{userRecord.title}</div>
 											</Button>
 											{
-												<Tag color="red" className="mx-2">
+												<Tag color="orange" className="mx-2">
 													{calculatUserAmount(userRecord.id)} €
 												</Tag>
 											}
@@ -621,47 +751,43 @@ function Getranke() {
 				afterClose={() => setItemsToCashout([])}
 				// //? ----------------------------------------------------------------- MODAL FOOTER ----------------------------------------
 				footer={[
-					<Row justify={"space-between"}>
-						<Popconfirm
-							placement="top"
-							title={"Hat die mitglieder alles bezhalt?"}
-							onConfirm={() => closeUserTab(userSelected)}
-							okText="Ja"
-							cancelText="Nein"
-						>
-							{drinks
-								.filter((d) => d.uid === userSelected)
-								.reduce((acc, val) => acc + val.price * val.amount, 0) > 0 && (
-								<Button key="3" danger>
-									Pay everything (
-									{drinks
-										.filter((d) => d.uid === userSelected)
-										.reduce((acc, val) => acc + val.price * val.amount, 0)
-										.toFixed(2) + " €"}
-									)
-								</Button>
-							)}
-						</Popconfirm>
-
-						<div>
-							<Button key="1" onClick={closeUserModal}>
-								Cancel
+					<Row justify={"end"}>
+						<Button key="1" onClick={closeUserModal}>
+							Cancel
+						</Button>
+						{drinks.findIndex((d) => d.uid === userSelected) === -1 ? (
+							<Button key="2" danger onClick={() => closeUserTab(userSelected)}>
+								Remove User
 							</Button>
-							{drinks.findIndex((d) => d.uid === userSelected) === -1 ? (
-								<Button
-									key="2"
-									danger
-									onClick={() => closeUserTab(userSelected)}
-								>
-									Remove User
-								</Button>
-							) : (
-								<>
-									{calculateCashOut() > 0 && (
+						) : (
+							<>
+								{calculateCashOut(itemsToCashout) > 0 &&
+									(isEverythingSelected(userSelected, backupDrinks) ? (
+										computeDrinksTotalToPay(drinks, userSelected) > 0 && (
+											<Popconfirm
+												placement="top"
+												title={"Hat die mitglieder alles bezhalt?"}
+												onConfirm={() => closeUserTab(userSelected)}
+												okText="Ja"
+												cancelText="Nein"
+											>
+												<Button key="3" danger>
+													Pay everything (
+													{computeDrinksTotalToPay(
+														drinks,
+														userSelected
+													).toFixed(2) + " €"}
+													)
+												</Button>
+											</Popconfirm>
+										)
+									) : (
 										<Popconfirm
 											placement="top"
 											title={
-												"Hat die mitglieder " + calculateCashOut() + " bezhalt?"
+												"Hat die mitglieder " +
+												calculateCashOut(itemsToCashout) +
+												" bezhalt?"
 											}
 											onConfirm={
 												itemsToCashout.length > 0 && removeCashedOutDrinks
@@ -673,16 +799,24 @@ function Getranke() {
 												Pay selected drinks
 											</Button>
 										</Popconfirm>
-									)}
-								</>
-							)}
-						</div>
+									))}
+							</>
+						)}
 					</Row>,
 				]}
 			>
 				{/* //? -------------------------------------------------------------------------------- DRINK LIST --------------------------- */}{" "}
-				<div className="my-1 fs-6 px-3 py-2">Getränke Liste</div>
-				{backupDrinks.map((d, i) => {
+				<Row justify={"space-between"} align={"middle"}>
+					<div className="my-1 fs-6 px-3 py-2">Getränke Liste</div>
+					<Button
+						icon={<BarsOutlined />}
+						type="link"
+						onClick={() => payEverything()}
+					>
+						Select everything
+					</Button>
+				</Row>
+				{backupDrinks?.map((d, i) => {
 					if (d.uid === userSelected) {
 						return (
 							<>
@@ -736,7 +870,9 @@ function Getranke() {
 				>
 					<Col>Ingesamt</Col>
 					<Col>
-						<strong>{calculateCashOut() + " €"}</strong>
+						<strong className="text-warning">
+							{calculateCashOut(itemsToCashout) + " €"}
+						</strong>
 					</Col>
 				</Row>
 				<div className="bg-success text-dark bg-opacity-10 rounded text-danger">

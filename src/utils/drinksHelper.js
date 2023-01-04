@@ -12,3 +12,39 @@ export const userHasActiveDrinks = (userID, drinks) => {
 	console.log(drinksOfSingleUser);
 	return drinksOfSingleUser.length > 0 ? true : false;
 };
+
+export const isEverythingSelected = (userID, drinks) => {
+	return drinks.filter((d) => d.uid === userID).every((d) => d.amount === 0);
+};
+
+//* Sums up the items into the cashout array
+export const calculateCashOut = (itemsToCashout) =>
+	itemsToCashout
+		.reduce((acc, val) => acc + val.price * val.amount, 0)
+		.toFixed(2);
+
+export const computeDrinksTotalToPay = (drinks, userSelected) =>
+	drinks
+		.filter((d) => d.uid === userSelected)
+		.reduce((acc, val) => acc + val.price * val.amount, 0);
+
+export const selectAllDrinksToBePaid = (drinks, userID) => {
+	const items = [];
+	drinks.forEach((d) => {
+		if (d.uid === userID) {
+			const [exDrink] = drinks.filter((e) => e.key === d.key);
+			items.push({ ...d, amount: exDrink.amount });
+		}
+	});
+	return items;
+};
+
+export const setBackupArrayForTotalCashout = (drinks, userID) => {
+	const backup = [];
+	drinks.forEach((d) => {
+		if (d.uid === userID) {
+			backup.push({ ...d, amount: 0 });
+		}
+	});
+	return backup;
+};

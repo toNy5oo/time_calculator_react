@@ -5,12 +5,12 @@ import {
 	UserOutlined,
 	PhoneOutlined,
 	InfoOutlined,
-	MoreOutlined,
+	HolderOutlined,
 	NumberOutlined,
 } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
 
-const Header = () => {
+const RowHeader = ({ isActualBookings }) => {
 	return (
 		<Container>
 			<Row
@@ -34,12 +34,14 @@ const Header = () => {
 				<Col span={8}>
 					<InfoOutlined />
 				</Col>
-				<Col span={3}>
-					<MoreOutlined />
-				</Col>
+				{isActualBookings && (
+					<Col span={3}>
+						<HolderOutlined />
+					</Col>
+				)}
 			</Row>
 		</Container>
 	);
 };
 
-export default Header;
+export default RowHeader;

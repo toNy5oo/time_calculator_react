@@ -25,7 +25,7 @@ export const disabledDateTime = () => ({
 
 export const disabledDate = (current) => {
 	// Can not select days before today
-	return current && current < moment().subtract(1, "day").endOf("day");
+	return current && current < moment().subtract(40, "day").endOf("day");
 };
 
 const range = (start, end) => {
@@ -35,8 +35,6 @@ const range = (start, end) => {
 	}
 	return result;
 };
-
-
 
 export const parseDate = (date, time) => {
 	const dateTime = moment(date + " " + time, "DD/MM/YYYY HH:mm");

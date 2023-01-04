@@ -8,8 +8,8 @@ import {
 	ReloadOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
-import Header from "./Header";
 import { AnimateSharedLayout, motion } from "framer-motion";
+import RowHeader from "./RowHeader";
 
 const BookingDate = ({
 	bookings,
@@ -17,6 +17,7 @@ const BookingDate = ({
 	showEditModal,
 	deleteBooking,
 	repeatBooking,
+	isActualBookings,
 }) => {
 	return (
 		<>
@@ -32,7 +33,7 @@ const BookingDate = ({
 						<span className="mx-1">{date}</span>
 					</div>
 				</Row>
-				<Header />
+				<RowHeader isActualBookings={isActualBookings} />
 				{/* </Divider> */}
 				<div>
 					{bookings?.map((booking) => (
@@ -57,37 +58,39 @@ const BookingDate = ({
 									<Col span={1}>{booking.table}</Col>
 									<Col span={4}>{booking.phone}</Col>
 									<Col span={8}>{booking.extra}</Col>
-									<Col span={3}>
-										<Tooltip title="Reservierung bearbeiten">
-											<Button
-												type="link"
-												icon={<EditOutlined />}
-												onClick={() => showEditModal(booking.id)}
-											/>
-										</Tooltip>
-										{/* <Button
+									{isActualBookings && (
+										<Col span={3}>
+											<Tooltip title="Reservierung bearbeiten">
+												<Button
+													type="link"
+													icon={<EditOutlined />}
+													onClick={() => showEditModal(booking.id)}
+												/>
+											</Tooltip>
+											{/* <Button
 								type="link"
 								className="text-info"
 								icon={<ReloadOutlined />}
 								onClick={() => repeatBooking(booking.id)}
 							/> */}
-										<Popconfirm
-											title="Are you sure to delete this booking"
-											onConfirm={() => deleteBooking(booking.id)}
-											// onCancel={cancel}
-											okText="Yes"
-											cancelText="No"
-										>
-											<Tooltip title="Reservierung löschen">
-												<Button
-													type="link"
-													danger
-													icon={<DeleteOutlined />}
-													// onClick={() => deleteBooking(booking.id)}
-												/>
-											</Tooltip>
-										</Popconfirm>
-									</Col>
+											<Popconfirm
+												title="Are you sure to delete this booking"
+												onConfirm={() => deleteBooking(booking.id)}
+												// onCancel={cancel}
+												okText="Yes"
+												cancelText="No"
+											>
+												<Tooltip title="Reservierung löschen">
+													<Button
+														type="link"
+														danger
+														icon={<DeleteOutlined />}
+														// onClick={() => deleteBooking(booking.id)}
+													/>
+												</Tooltip>
+											</Popconfirm>
+										</Col>
+									)}
 								</Row>
 							</motion.div>
 						</AnimateSharedLayout>
