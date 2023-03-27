@@ -3,14 +3,13 @@ import React from "react";
 import {
 	ClockCircleOutlined,
 	UserOutlined,
-	PhoneOutlined,
 	InfoOutlined,
 	HolderOutlined,
 	NumberOutlined,
 } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
 
-const RowHeader = ({ isActualBookings }) => {
+const RowHeader = () => {
 	return (
 		<Container>
 			<Row
@@ -22,23 +21,18 @@ const RowHeader = ({ isActualBookings }) => {
 				<Col span={2}>
 					<ClockCircleOutlined />
 				</Col>
-				<Col span={6}>
+				<Col span={7}>
 					<UserOutlined />
 				</Col>
-				<Col span={1}>
+				<Col span={2}>
 					<NumberOutlined />
 				</Col>
-				<Col span={4}>
-					<PhoneOutlined />
-				</Col>
-				<Col span={8}>
+				<Col span={9}>
 					<InfoOutlined />
 				</Col>
-				{isActualBookings && (
-					<Col span={3}>
-						<HolderOutlined />
-					</Col>
-				)}
+				<Col span={2}>
+					<HolderOutlined />
+				</Col>
 			</Row>
 		</Container>
 	);
