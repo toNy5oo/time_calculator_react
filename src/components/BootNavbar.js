@@ -65,52 +65,6 @@ function BootNavbar() {
 					</Navbar.Collapse>
 				</Container>
 			</Navbar>
-
-			{/* {['lg'].map((expand) => (
-                <Navbar
-                    key={expand}
-                    bg="light"
-                    expand={expand}
-                    className="mb-3"
-                    collapseOnSelect
-                >
-                    <Container fluid>
-                        <Image src={logo} alt="Pooltime | BC Hanunstetten" />
-                        <Navbar.Toggle
-                            aria-controls={`offcanvasNavbar-expand-${expand}`}
-                        />
-                        <Navbar.Offcanvas
-                            id={`offcanvasNavbar-expand-${expand}`}
-                            aria-labelledby={`offcanvasNavbarLabel-expand-${expand}`}
-                            placement="end"
-                        >
-                            <Offcanvas.Header closeButton>
-                                <Offcanvas.Title
-                                    id={`offcanvasNavbarLabel-expand-${expand}`}
-                                >
-                                    Offcanvas
-                                </Offcanvas.Title>
-                            </Offcanvas.Header>
-                            <Offcanvas.Body>
-                                <Nav className="justify-content-end flex-grow-1 pe-3">
-                                    <Link to="/" className="m-3">
-                                        Timer
-                                    </Link>
-                                    <Link to="/getranke" className="m-3">
-                                        Getränke
-                                    </Link>
-                                    <Link to="/reservierungen" className="m-3">
-                                        Reservierungen
-                                    </Link>
-                                    <Link to="/thekendienst" className="m-3">
-                                        Thekendienst
-                                    </Link>
-                                </Nav>
-                            </Offcanvas.Body>
-                        </Navbar.Offcanvas>
-                    </Container>
-                </Navbar>
-            ))} */}
 		</>
 	);
 }
