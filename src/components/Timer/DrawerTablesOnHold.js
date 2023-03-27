@@ -34,12 +34,12 @@ const DrawerTablesOnHold = ({
 	return (
 		<Drawer
 			title="Offene Rechnungen"
-			placement={"top"}
+			placement={"right"}
 			closable={false}
 			onClose={onClose}
 			open={open}
 			key={"right"}
-			height={"46%"}
+			width={window.innerWidth > 1200 ? '50%' : '80%'}
 		>
 			<List
 				itemLayout="horizontal"
@@ -102,7 +102,7 @@ const DrawerTablesOnHold = ({
 						<List.Item.Meta
 							avatar={
 								<Avatar
-									src={require(`../assets/img/${item.tableNumber}ball.png`)}
+									src={`/img/${item.tableNumber}ball.png`}
 								/>
 							}
 							title={<TableOnHold table={item} />}
