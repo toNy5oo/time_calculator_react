@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
+import "./style.css";
 import {
-	Empty,
 	Form,
 	Input,
 	Button,
@@ -11,8 +11,13 @@ import {
 	Col,
 	Modal,
 	notification,
+	Calendar,
+	Tag,
 } from "antd";
 
+
+import "moment/locale/de";
+import locale from "antd/es/date-picker/locale/zh_CN";
 import moment from "moment";
 import Localbase from "localbase";
 import Booking from "./BookingDate";
@@ -39,36 +44,57 @@ import {
 	EDIT_SUCC_TITLE,
 } from "./string";
 import { PageHeader } from "./PageHeader";
+import RowHeader from "./RowHeader";
+import MonthSelector from "./MonthSelector";
+import Header from "./Header";
 
 function Reservierungen() {
 	const [data, setData] = useState([]);
+	const [monthlyData, setMonthlyData] = useState([]);
 	const [bookings, setBookings] = useState([]);
-	const [oldBookings, setOldBookings] = useState([]);
-	const [uniqueDates, setUniqueDates] = useState([]);
-	const [uniqueOldDates, setUniqueOldDates] = useState([]);
-	const [editRecord, setEditRecord] = useState([]);
-	const [interval, setInterval] = useState(
-		moment().add(3, "days").format("DD/MM/YYYY")
+	const [selectedDate, setSelectedDate] = useState(
+		moment().format("DD/MM/YYYY")
 	);
-	const [isActualBookings, setIsActualBookings] = useState(true);
+	const [editRecord, setEditRecord] = useState([]);
 	const EMPTY_STRING = "";
 	const [open, setOpen] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [segmentedMonth, setSegmentedMonth] = useState(() =>
+		moment().format("MMMM")
+	);
+	const [value, setValue] = useState(() => moment());
 
 	let db = new Localbase("pooltime_BOOKINGS");
 	const collName = "bookings";
 
-	//Comment to remove logger
+	// //Comment to remove logger
 	db.config.debug = false;
+
+	const colorsBadge = [
+		{ table: "Snooker", color: "#090" },
+		{ table: "7", color: "#c60" },
+		{ table: "8", color: "black" },
+		{ table: "9", color: "#ffae00" },
+		{ table: "10", color: "#108ee9" },
+	];
 
 	useEffect(() => {
 		getDBdata();
 	}, []);
 
 	useEffect(() => {
-		console.log("Data ", data);
-		setBookingsArrays();
+		setBookings(data.filter((b) => b.date === selectedDate));
+		setMonthlyData(
+			data.filter((b) => moment(b.date).format("MMMM") === segmentedMonth)
+		);
 	}, [data]);
+
+	useEffect(() => {
+		console.log("month changed", segmentedMonth);
+		setMonthlyData(
+			data.filter((b) => moment(b.date).format("MMMM") === segmentedMonth)
+		);
+	}, [value]);
 
 	// ! -------------------------------------- FETCHING DATA
 
@@ -92,57 +118,6 @@ function Reservierungen() {
 		}
 	};
 
-	const setBookingsArrays = () => {
-		const bookingsFromToday = data.filter((e) =>
-			moment(e.date, "DD/MM/YYYY").isAfter(
-				moment(moment().subtract(1, "day"), "DD/MM/YYYY")
-			)
-		);
-
-		/** Gets records until today */
-		const bookingsUntilToday = data.filter((e) =>
-			moment(e.date, "DD/MM/YYYY").isBefore(
-				moment(moment().subtract(1, "day"), "DD/MM/YYYY")
-			)
-		);
-
-		let dateSet = new Set();
-
-		for (const booking of bookingsFromToday) {
-			dateSet.add(booking.date);
-		}
-		//Create array from SET
-		const uniqueActualDates = Array.from(dateSet).sort((a, b) =>
-			moment(a, "DD/MM/YYYY").isAfter(moment(b, "DD/MM/YYYY"))
-		);
-
-		dateSet = new Set();
-
-		for (const booking of bookingsUntilToday) {
-			dateSet.add(booking.date);
-		}
-		//Create array from SET
-		const uniqueOldDates = Array.from(dateSet).sort((a, b) =>
-			moment(a, "DD/MM/YYYY").isAfter(moment(b, "DD/MM/YYYY"))
-		);
-
-		const orderedActualBookings = getOrderedBookings(
-			bookingsFromToday,
-			uniqueActualDates
-		);
-
-		const orderedOldBookings = getOrderedBookings(
-			bookingsUntilToday,
-			uniqueOldDates
-		);
-
-		setBookings(orderedActualBookings);
-		setOldBookings(orderedOldBookings);
-
-		setUniqueDates(createDatesArray(bookingsFromToday));
-		setUniqueOldDates(createDatesArray(bookingsUntilToday));
-	};
-
 	const removeOldBookingFromDB = (databaseResponse) => {
 		/** Removes past bookings */
 		const pastBookings = databaseResponse.filter((e) =>
@@ -159,33 +134,6 @@ function Reservierungen() {
 				console.log(error);
 			}
 		});
-	};
-
-	const createDatesArray = (response) => {
-		//Get unique list of dates
-		const dateSet = new Set();
-
-		for (const booking of response) {
-			dateSet.add(booking.date);
-		}
-		//Create array from SET
-		return Array.from(dateSet).sort((a, b) =>
-			moment(a, "DD/MM/YYYY").isAfter(moment(b, "DD/MM/YYYY"))
-		);
-	};
-
-	const getOrderedBookings = (b, dateSet) => {
-		console.log(b);
-		console.log(dateSet);
-		/** Creates a subarray for each single date and add that to OrderedArray */
-
-		const orderedBookings = [];
-		for (const date of dateSet) {
-			const singleDateBookings = b.filter((booking) => booking.date === date);
-			orderedBookings.push(singleDateBookings);
-		}
-		console.log(orderedBookings);
-		return orderedBookings;
 	};
 
 	/**
@@ -228,7 +176,6 @@ function Reservierungen() {
 		name: form.name,
 		date: form.date.format("DD/MM/YYYY"),
 		time: form.date.format("HH:mm"),
-		phone: form.phone ? form.phone : EMPTY_STRING,
 		table: form.table ? form.table : EMPTY_STRING,
 		extra: form.extra ? form.extra : EMPTY_STRING,
 	});
@@ -239,7 +186,6 @@ function Reservierungen() {
 		name: form.name,
 		date: form.date.format("DD/MM/YYYY"),
 		time: form.date.format("HH:mm"),
-		phone: form.phone ? form.phone : EMPTY_STRING,
 		table: form.table ? form.table : EMPTY_STRING,
 		extra: form.extra ? form.extra : EMPTY_STRING,
 	});
@@ -251,10 +197,12 @@ function Reservierungen() {
 		});
 	};
 
-	/** Changes the interval from the Select of the amount of days */
-	const showSelectedDays = (val) => {
-		const dateSelected = moment().add(val, "days").format("DD/MM/YYYY");
-		setInterval(dateSelected);
+	const getTableColor = (table) => {
+		let color;
+		colorsBadge.forEach((item) => {
+			if (item.table === table) color = item.color;
+		});
+		return color;
 	};
 
 	// ! -------------------------------------- MODAL
@@ -289,12 +237,11 @@ function Reservierungen() {
 		addReservationsToDatabase(reservation);
 	};
 
-	// ! -------------------------------------- ACTIONS BUTTON
+	// // ! -------------------------------------- ACTIONS BUTTON
 
-	//!TODO Implement action functions
+	// //!TODO Implement action functions
 	const editBooking = (form) => {
 		const reservation = updateReservation(form);
-		console.log(reservation);
 		editReservationsToDatabase(reservation);
 		closeModal();
 	};
@@ -310,53 +257,72 @@ function Reservierungen() {
 		}
 	};
 
-	const repeatBooking = (recordID) => {
-		console.log(recordID);
-	};
-
-	const showOldBookings = () => {
-		setIsActualBookings(!isActualBookings);
-	};
+	// const repeatBooking = (recordID) => {
+	// 	console.log(recordID);
+	// };
 
 	// ! -------------------------------------- RENDER
 
+	const dateCellRender = (value) => {
+		return (
+			<ul className="events">
+				{data.map(
+					(item) =>
+						moment(value).format("DD/MM/YYYY") === item.date && (
+							<li key={item}>
+								<Tag color={getTableColor(item.table)}>
+									{item.time} | {item.name}
+								</Tag>
+							</li>
+						)
+				)}
+			</ul>
+		);
+	};
+
+	const onSelect = (value) => {
+		const date = moment(value).format("DD/MM/YYYY");
+		setSelectedDate(date);
+		setBookings(data.filter((b) => b.date === date));
+	};
+
+	const changeMonthView = (val) => {
+		setValue(moment(val, "MMMM"));
+	};
+
 	return (
 		<>
-			<PageHeader
-				showSelectedDays={showSelectedDays}
-				showDrawer={showDrawer}
-				showOldBookings={showOldBookings}
-				isActualBookings={isActualBookings}
+			<PageHeader showDrawer={showDrawer} />
+			<Header selectedDate={selectedDate} />
+			
+			<Row className="mb-4">
+				<RowHeader />
+				<Booking
+					bookings={bookings}
+					showEditModal={showEditModal}
+					deleteBooking={deleteBooking}
+				/>
+			</Row>
+
+			<Calendar
+				value={value}
+				dateCellRender={dateCellRender}
+				onSelect={onSelect}
+				locale={locale}
+				defaultValue={moment().format("DD/MM/YYYY")}
+				headerRender={() => (
+					<Row justify={"center"} className="p-4 text-center">
+						<Col>
+							<MonthSelector
+								value={value}
+								changeMonthView={changeMonthView}
+								segmentedMonth={segmentedMonth}
+							/>
+						</Col>
+					</Row>
+				)}
 			/>
-			{/* //! ------------------------------ Actual bookings ------------------------------ */}
-			{isActualBookings &&
-				bookings.length > 0 &&
-				bookings.map((singleDateArray, index) => (
-					<Booking
-						key={index + singleDateArray.length}
-						bookings={singleDateArray}
-						date={uniqueDates[index]}
-						showEditModal={showEditModal}
-						deleteBooking={deleteBooking}
-						repeatBooking={repeatBooking}
-						isActualBookings={isActualBookings}
-					/>
-				))}
-			{/* //! ------------------------------ Old bookings ------------------------------ */}
-			{!isActualBookings &&
-				oldBookings?.length > 0 &&
-				oldBookings?.map((singleDateArray, index) => (
-					<Booking
-						key={index + singleDateArray.length}
-						bookings={singleDateArray}
-						date={uniqueOldDates[index]}
-						showEditModal={null}
-						deleteBooking={null}
-						repeatBooking={null}
-						isActualBookings={isActualBookings}
-					/>
-				))}
-			{/* //!--------------------------------------------------- DRAWER */}
+
 			<Drawer
 				title={"Neue Reservierung"}
 				width={720}
@@ -396,10 +362,10 @@ function Reservierungen() {
 								<DatePicker
 									format="DD/MM/YYYY HH:mm"
 									hideDisabledOptions
-									minuteStep={5}
+									minuteStep={15}
 									disabledDate={disabledDate}
 									disabledTime={disabledDateTime}
-									showTime={{ defaultValue: moment("00:00:00", "HH:mm") }}
+									showTime={{ defaultValue: moment("00:18:00", "HH:mm") }}
 									style={{
 										width: "100%",
 									}}
@@ -408,11 +374,6 @@ function Reservierungen() {
 						</Col>
 					</Row>
 					<Row gutter={16}>
-						<Col span={12}>
-							<Form.Item name="phone" label="Handynummer">
-								<Input />
-							</Form.Item>
-						</Col>
 						<Col span={12}>
 							<Form.Item name="table" label="Tisch">
 								<Select placeholder="Please choose a table">
@@ -443,7 +404,7 @@ function Reservierungen() {
 					</Row>
 				</Form>
 			</Drawer>
-			{/* //!--------------------------------------------------- MODAL */}
+
 			<Modal
 				title="Reservierung Bearbeiten"
 				open={isModalOpen}
@@ -483,10 +444,10 @@ function Reservierungen() {
 								<DatePicker
 									format="DD/MM/YYYY HH:mm"
 									hideDisabledOptions
-									minuteStep={5}
+									minuteStep={15}
 									disabledDate={disabledDate}
 									disabledTime={disabledDateTime}
-									showTime={{ defaultValue: moment("00:00:00", "HH:mm") }}
+									showTime={{ defaultValue: moment("00:18:00", "HH:mm") }}
 									style={{
 										width: "100%",
 									}}
@@ -495,15 +456,6 @@ function Reservierungen() {
 						</Col>
 					</Row>
 					<Row gutter={16}>
-						<Col span={12}>
-							<Form.Item
-								name="phone"
-								label="Handynummer"
-								initialValue={editRecord?.phone}
-							>
-								<Input />
-							</Form.Item>
-						</Col>
 						<Col span={12}>
 							<Form.Item
 								name="table"
