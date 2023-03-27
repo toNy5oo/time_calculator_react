@@ -7,11 +7,8 @@ import dayjs from "dayjs";
 export const calculateInitalTime = () => {
 	const now = dayjs();
 	const minutes = dayjs().minute();
-	console.log("Minutes =>", minutes);
 	const mutiplier = parseInt(minutes / 5);
-	console.log("Multiplier =>", mutiplier);
 	now.minute(now.minute() - mutiplier);
-	console.log(dayjs(now, "HH:mm"));
 	return dayjs(dayjs().minute(5 * mutiplier), "HH:mm");
 	// return now.format("DD/MM/YYYY HH:mm");
 };
@@ -22,8 +19,6 @@ export const timePlayed = (start, end) => {
 	let endTime = dayjs(end, "DD-MM-YYYY hh:mm");
 
 	let minutesDiff = Math.floor(endTime.diff(startTime, "minute", true));
-	console.log("Diff => ", minutesDiff);
-	console.log("Diff => ", Math.round(minutesDiff));
 	return minutesDiff;
 };
 
