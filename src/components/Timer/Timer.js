@@ -3,9 +3,8 @@ import TimerHeader from "./TimerHeader";
 import Table from "./Table";
 import React, { useState, useEffect, useRef } from "react";
 import { notification } from "antd";
-import { SmileOutlined } from "@ant-design/icons";
 import { DEFAULT_TEMPLATE } from "../../components/assets/data/tablesArray";
-import * as price from "../assets/data/const";
+import * as price from "../assets/const/const";
 import dayjs from "dayjs";
 import {
 	calculateInitalTime,
@@ -15,15 +14,16 @@ import {
 import autoAnimate from "@formkit/auto-animate";
 
 const closeTableNotification = (num) => {
-	notification.open({
-		message: `Tisch ${num} ist gespeichert`,
-		description: "This is the content of the notification.",
-		icon: <SmileOutlined style={{ color: "#108ee9" }} />,
+	notification.success({
+		type: "success",
+		message: `Tisch ${num} ist jetzt nochmal frei`,
+		description:
+			"The table has been closed and now is available again to be rented.",
 	});
 };
 
 const holdTableNotification = (num, message, desc) => {
-	notification.open({
+	notification.success({
 		message: `${message}`,
 		description: `${desc}`,
 	});
@@ -64,7 +64,6 @@ function Timer() {
 	/**
 	 * Retrieving JSON string from localStorage to restore the state
 	 */
-
 	const closeHoldTable = (num) => {
 		holdTableNotification(
 			num,
@@ -271,27 +270,30 @@ function Timer() {
 					align="center"
 					className="mx-5 mt-3"
 					ref={parent}
+					gutter={16}
 				>
 					{tables.map(
-						(table) =>
+						(table, index) =>
 							table.isActive && (
 								<Col
 									key={`key${table.tableNumber}`}
 									xs={24}
-									sm={12}
-									xl={6}
-									className="p-1 my-3 d-flex justify-content-around"
+									sm={16}
+									md={12}
+									lg={6}
+									xxl={4}
+									className="my-2 d-flex justify-content-around"
 								>
 									<Table
 										table={table}
-										key={table.tableNumber + Math.random()}
+										key={`${index}-${table.tableNumber}`}
 										closeTable={closeTable}
 										startTime={startTime}
 										endTime={endTime}
 										toggleDiscount={toggleDiscount}
 										addHoldTable={addHoldTable}
 										setEndTime={setEndTime}
-									/>{" "}
+									/>
 								</Col>
 							)
 					)}{" "}
