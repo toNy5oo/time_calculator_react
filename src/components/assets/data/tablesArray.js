@@ -99,7 +99,17 @@ export const DEFAULT_TEMPLATE = [{
         pending: false,
     },
     {
-        tableNumber: 147,
+        tableNumber: 11,
+        isActive: false,
+        start: 0,
+        end: 0,
+        played: 0,
+        discount: false,
+        toPay: 0,
+        pending: false,
+    },
+    {
+        tableNumber: 12,
         isActive: false,
         start: 0,
         end: 0,
