@@ -1,7 +1,7 @@
 import { Col, Row } from "antd";
 import TimerHeader from "./TimerHeader";
 import Table from "./Table";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { notification } from "antd";
 import { DEFAULT_TEMPLATE } from "../../components/assets/data/tablesArray";
 import * as price from "../assets/const/const";
@@ -42,15 +42,13 @@ function Timer() {
 			? JSON.parse(localStorage.getItem("holdtables"))
 			: []
 	);
-	const [activeTables, setActiveTables] = useState(0);
-	const [isEmpty, setIsEmpty] = useState(true);
 
-	const countActiveTables = () => tables.filter((obj) => obj.isActive);
-
-	useEffect(() => {
-		tables.map((table) => table.isActive && setIsEmpty(false));
-		setActiveTables(countActiveTables().length);
-	}, [tables, holdTables]);
+	const {isEmpty, activeTables} =
+		useMemo(() => {
+			const isEmpty = (tables.every((table) => !table.isActive))
+			const activeTables = tables.filter((obj) => obj.isActive).length
+			return {isEmpty, activeTables}
+		},[tables])
 
 	useEffect(() => {
 		localStorage.setItem("tables", JSON.stringify(tables));
@@ -243,11 +241,9 @@ function Timer() {
 		});
 		//Remove tables in hold
 		setHoldTables([]);
-
-		setIsEmpty(true);
-		//Count active tables
-		setActiveTables(countActiveTables().length);
 	};
+
+	
 
 	return (
 		<main>
@@ -275,7 +271,7 @@ function Timer() {
 						(table, index) =>
 							table.isActive && (
 								<Col
-									key={`key${table.tableNumber}`}
+									key={table.tableNumber}
 									xs={24}
 									sm={16}
 									md={12}
