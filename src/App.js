@@ -9,6 +9,10 @@ import Reservierungen from "./components/Reservierungen/Reservierungen";
 import BootNavbar from "./components/BootNavbar";
 
 // const { defaultAlgorithm, darkAlgorithm } = theme;
+const routes = [
+	{path: '/', component: <Timer />},
+	{path: '/getranke', component: <Getranke />},
+	{path: '/reservierungen', component: <Reservierungen />}]
 
 function App() {
 	// const [isDarkMode, setIsDarkMode] = useState(false);
@@ -25,9 +29,7 @@ function App() {
 					<BootNavbar />
 					<Content>
 						<Routes>
-							<Route path="/" element={<Timer />} />{" "}
-							<Route path="/getranke" element={<Getranke />} />{" "}
-							<Route path="/reservierungen" element={<Reservierungen />} />{" "}
+							{routes.map((route) => (<Route path={route.path} element={route.component} />))}
 						</Routes>{" "}
 					</Content>{" "}
 				</Suspense>{" "}
