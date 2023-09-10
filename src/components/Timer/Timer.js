@@ -239,8 +239,7 @@ function Timer() {
 	//Gets every table and closes it
 	const resetAllTables = () => {
 		tables.forEach((t, i) => {
-			//If snooker table (has different table number)
-			i !== 10 ? closeTable(i + 1, false) : closeTable(147, false);
+			closeTable(i + 1, false) 
 		});
 		//Remove tables in hold
 		setHoldTables([]);
