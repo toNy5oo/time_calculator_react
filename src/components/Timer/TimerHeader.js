@@ -39,7 +39,7 @@ function TimerHeader({
 	const singleItem = (num) => {
 		return (
 			<Space align="center">
-				<div className="text-xs">Tisch</div>
+				{/* <div className="text-xs">Tisch</div> */}
 				<Avatar
 					src={`/img/${num}ball.png`}
 					size="small"
@@ -62,6 +62,7 @@ function TimerHeader({
 							<strong className="fs-5">{holdTables.length}</strong>
 						</Space>
 					</Col>
+					
 					<Col className="center p-4 d-flex">
 						<Popconfirm
 							title="Bist du sicher, dass du alle Tische zurücksetzen möchtest?"
@@ -71,9 +72,9 @@ function TimerHeader({
 							cancelText="Nein"
 							onConfirm={() => resetAllTables()}
 						>
-							<Button danger className="mx-2">
+							{tables.some((table) => (table.isActive)) && <Button danger className="mx-2">
 								Tische zurücksetzen
-							</Button>
+							</Button>}
 						</Popconfirm>
 						{holdTables.length > 0 && (
 							<Badge count={holdTables.length}>
@@ -90,6 +91,7 @@ function TimerHeader({
 				<Row wrap>
 					<Col className="mx-4">
 						<Space size={"small"} wrap>
+							<div className="fs-6 text-muted mx-2">Freie Tische:</div> 
 							{tables.map(
 								(table) =>
 									!table.isActive && (
