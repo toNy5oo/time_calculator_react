@@ -1,4 +1,4 @@
-export const FULL_PRICE = 10;
-export const HALF_PRICE = 5;
-export const FULL_PRICE_MIN = parseFloat(10/60);
-export const HALF_PRICE_MIN = parseFloat(5/60);
+export const FULL_PRICE = 12;
+export const HALF_PRICE = FULL_PRICE / 2;
+export const FULL_PRICE_MIN = parseFloat(FULL_PRICE/60);
+export const HALF_PRICE_MIN = parseFloat(HALF_PRICE/60);
