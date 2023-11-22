@@ -7,11 +7,13 @@ import Getranke from "./components/Getranke/Getranke";
 import Timer from "./components/Timer/Timer";
 import Reservierungen from "./components/Reservierungen/Reservierungen";
 import BootNavbar from "./components/BootNavbar";
+import Settings from "./components/Settings/Settings";
 
 // const { defaultAlgorithm, darkAlgorithm } = theme;
 const routes = [
 	{path: '/', component: <Timer />},
 	{path: '/getranke', component: <Getranke />},
+	{path: '/settings', component: <Settings />},
 	{path: '/reservierungen', component: <Reservierungen />}]
 
 function App() {
