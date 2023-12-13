@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import Icon, { HomeOutlined } from "@ant-design/icons";
+import {
+  OrderedListOutlined,
+  AppstoreOutlined,
+} from "@ant-design/icons";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import {
   Row,
@@ -10,10 +13,12 @@ import {
   Col,
   Badge,
   Divider,
+  Segmented,
 } from "antd";
 
 import Container from "react-bootstrap/Container";
 import DrawerTablesOnHold from "./DrawerTablesOnHold";
+import { DEFAULT_LAYOUT } from "../assets/data/tablesArray";
 
 function TimerHeader({
   tables,
@@ -22,6 +27,7 @@ function TimerHeader({
   activeTables,
   holdTables,
   closeHoldTable,
+  setLayout,
 }) {
   const [holdTableClicked, setHoldTableClicked] = useState(0);
   const [sharedBill, setSharedBill] = useState("2");
@@ -43,6 +49,11 @@ function TimerHeader({
 
   const onSelectedItems = (key) => {
     openTable(key);
+  };
+
+  const changeLayout = (layoutSelected) => {
+    localStorage.setItem("layout", layoutSelected);
+    setLayout(layoutSelected);
   };
 
   return (
@@ -95,6 +106,28 @@ function TimerHeader({
             )}
           </Col>
         </Row>
+
+        <Row align={"middle"} justify={"end"}>
+          <Segmented
+            defaultValue={
+              localStorage.getItem("layout") || DEFAULT_LAYOUT
+            }
+            onChange={(value) => changeLayout(value)}
+            options={[
+              {
+                label: "Grid",
+                value: "grid",
+                icon: <AppstoreOutlined />,
+              },
+              {
+                label: "List",
+                value: "list",
+                icon: <OrderedListOutlined />,
+              },
+            ]}
+          />
+        </Row>
+
         <Row wrap>
           <Col className="mx-4">
             <Space size={"small"} wrap>
