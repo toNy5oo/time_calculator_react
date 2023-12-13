@@ -1,13 +1,19 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Reset = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Reset local storage
     localStorage.clear();
 
-    // Redirect to main page after reset
-    window.location.href = "/";
-  }, []);
+    // Optionally, you can set some initial values after clearing
+    // localStorage.setItem('key', 'value');
+
+    // Redirect to another route after reset
+    navigate("/");
+  }, [navigate]);
 
   return (
     <div>
