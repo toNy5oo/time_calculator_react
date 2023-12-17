@@ -4,7 +4,7 @@ import dayjs from "dayjs";
  * The function calculates the closest interval to the actual time and returns
  * a dayjs object with that minutes set.
  */
-export const calculateInitalTime = () => {
+export const currentTime = () => {
   const now = dayjs();
   const minutes = dayjs().minute();
   const mutiplier = parseInt(minutes / 5);
