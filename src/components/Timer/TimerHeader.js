@@ -138,6 +138,7 @@ function TimerHeader({
                 (table) =>
                   !table.isActive && (
                     <Avatar
+                      key={table.tableNumber}
                       src={`/img/${table.tableNumber}ball.png`}
                       size="small"
                       onClick={() =>
