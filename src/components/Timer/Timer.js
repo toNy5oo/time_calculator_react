@@ -8,7 +8,7 @@ import {
 } from "../../components/assets/data/tablesArray";
 import dayjs from "dayjs";
 import {
-  calculateInitalTime,
+  currentTime,
   isNotZero,
   timePlayed,
 } from "../../utils/timeHelper";
@@ -124,7 +124,7 @@ function Timer() {
           return {
             ...item,
             isActive: true,
-            start: calculateInitalTime(),
+            start: currentTime(),
           };
         }
         return item;
