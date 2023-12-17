@@ -56,12 +56,12 @@ function Table({
 
   function onOpenTable(time) {
     if (time !== null) startTime(time, table.tableNumber);
-    startTime(0, table.tableNumber);
+    else startTime(0, table.tableNumber);
   }
 
   function onCloseTable(time) {
     if (time == null) endTime(0, table.tableNumber);
-    endTime(time, table.tableNumber);
+    else endTime(time, table.tableNumber);
   }
 
   const descCardTime = (
