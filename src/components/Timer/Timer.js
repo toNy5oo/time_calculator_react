@@ -188,9 +188,8 @@ function Timer() {
 
   // ! -------------------------------------- END TIME
 
-  const setEndTime = (tableNumber) => {
-    const lastTimeSlot = dayjs().hour(23).minute(59);
-    endTime(lastTimeSlot, tableNumber);
+  const setEndTime = (time, tableNumber) => {
+    endTime(time, tableNumber);
   };
 
   //Update table on end time and minPlayed

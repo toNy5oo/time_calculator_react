@@ -92,12 +92,17 @@ function Table({
           <Button
             size="small"
             type="primary"
-            onClick={() => setEndTime(table.tableNumber)}
+            onClick={() =>
+              setEndTime(
+                dayjs().add(1, "day").hour(0).minute(0),
+                table.tableNumber
+              )
+            }
           >
-            End at 24:00
+            Ende am 24:00
           </Button>
         )}
-      />{" "}
+      />
     </Space>
   );
 
