@@ -19,22 +19,10 @@ import {
   HALF_PRICE_MIN,
   HourAndMinFormat,
 } from "../assets/const/const";
-
-const closeTableNotification = (num) => {
-  notification.success({
-    type: "success",
-    message: `Tisch ${num} ist jetzt nochmal frei`,
-    description:
-      "The table has been closed and now is available again to be rented.",
-  });
-};
-
-const holdTableNotification = (_, message, desc) => {
-  notification.success({
-    message: `${message}`,
-    description: `${desc}`,
-  });
-};
+import {
+  notifyOnClose,
+  notifyOnHold,
+} from "../../utils/notifications";
 
 function Timer() {
   const [isDisplayed, setIsDisplayed] = useState(1);
@@ -84,7 +72,7 @@ function Timer() {
    * Retrieving JSON string from localStorage to restore the state
    */
   const closeHoldTable = (num) => {
-    holdTableNotification(
+    notifyOnHold(
       num,
       "Tisch " + num,
       "Tisch wurde abgerechnet und zurückgesetzt."
@@ -109,14 +97,14 @@ function Timer() {
         setHoldTables((state) => [...state, obj]);
         closeTable(tableNumber);
       } else {
-        holdTableNotification(
+        notifyOnHold(
           tableNumber,
           "Tisch " + tableNumber + " kann nicht verschoben werden.",
           "Es fehlen entweder Start- oder Endzeit."
         );
       }
     } else
-      holdTableNotification(
+      notifyOnHold(
         tableNumber,
         "Tisch " + tableNumber + " kann nicht verschoben werden.",
         "Es befindet sich bereits ein Tisch " +
@@ -166,7 +154,7 @@ function Timer() {
         }
         return item;
       });
-      showMessage && closeTableNotification(tableNumber);
+      showMessage && notifyOnClose(tableNumber);
 
       return list;
     });
