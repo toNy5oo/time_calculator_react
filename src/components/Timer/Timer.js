@@ -1,4 +1,4 @@
-import { Col, Row, Spin, notification, Space, Avatar } from "antd";
+import { Col, Row, Spin, Space, Avatar } from "antd";
 import TimerHeader from "./TimerHeader";
 import Table from "./Table";
 import React, { useEffect, useRef, useMemo } from "react";
@@ -19,22 +19,10 @@ import {
   HALF_PRICE_MIN,
   HourAndMinFormat,
 } from "../assets/const/const";
-
-const closeTableNotification = (num) => {
-  notification.success({
-    type: "success",
-    message: `Tisch ${num} ist jetzt nochmal frei`,
-    description:
-      "The table has been closed and now is available again to be rented.",
-  });
-};
-
-const holdTableNotification = (_, message, desc) => {
-  notification.success({
-    message: `${message}`,
-    description: `${desc}`,
-  });
-};
+import {
+  closeTableNotification,
+  holdTableNotification,
+} from "../../utils/notifications";
 
 function Timer() {
   const [isDisplayed, setIsDisplayed] = useState(1);
@@ -57,13 +45,13 @@ function Timer() {
   );
 
   // To render the first active table in the list view
-  useEffect(() => {
-    const firstTableActive = tables.find(
-      (table) => table.isActive === true
-    );
-    if (firstTableActive)
-      setIsDisplayed(firstTableActive.tableNumber);
-  }, [tables]);
+  // useEffect(() => {
+  //   const firstTableActive = tables.find(
+  //     (table) => table.isActive === true
+  //   );
+  //   if (firstTableActive)
+  //     setIsDisplayed(firstTableActive.tableNumber);
+  // }, [tables]);
 
   const { isEmpty, activeTables } = useMemo(() => {
     const isEmpty = tables.every((table) => !table.isActive);
@@ -141,7 +129,6 @@ function Timer() {
         }
         return item;
       });
-
       return list;
     });
   };
@@ -167,7 +154,6 @@ function Timer() {
         return item;
       });
       showMessage && closeTableNotification(tableNumber);
-
       return list;
     });
   };
@@ -274,14 +260,14 @@ function Timer() {
 
   const tableRow = (table) => {
     return (
-      <div class="list-group px-2">
+      <div className="list-group px-2">
         <button
           className={`p-3 rounded my-2 list-group-item list-group-item-action ${
             isDisplayed === table.tableNumber && "active"
           }`}
           onClick={() => setIsDisplayed(table.tableNumber)}
         >
-          <div class="d-flex justify-content-between">
+          <div className="d-flex justify-content-between">
             <Space className="rounded">
               <Avatar
                 src={`/img/${table.tableNumber}ball.png`}
@@ -297,11 +283,11 @@ function Timer() {
               )}
             </div>
           </div>
-          {/* <div class="d-flex justify-content-between">
-            <div class="mb-1">
+          {/* <div className="d-flex justify-content-between">
+            <div className="mb-1">
               Angefangen {dayjs(table.start).format("HH:mm")}
             </div>
-            <div class="mb-1">
+            <div className="mb-1">
               Fertig {dayjs(table.end).format("HH:mm")}
             </div>
           </div> */}
